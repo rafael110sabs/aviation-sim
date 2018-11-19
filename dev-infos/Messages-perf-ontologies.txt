@@ -1,0 +1,44 @@
+
+Airplane <-> Airport
+
+Action                      / Performative / Ontology       / Content
+Airplane:
+Request for position        / REQUEST   / request-pos       /
+Request for meteo           / REQUEST   / request-meteo     /
+Request for parking         / PROPOSE   / propose-birth     /       (when airplane is born, only send to origin)
+Propose take off            / PROPOSE   / propose-takeoff   /
+Propose landing             / PROPOSE   / propose-land      /
+Inform that it as taked off / INFORM    / info-takeoff      /
+Inform that is as landed    / INFORM    / info-land         /
+Inform of colision          / INFORM    / info-colision     / X::Y
+
+Airport:
+Reply with position         / CONFIRM           / request-pos       / X::Y
+Reply with meteo            / CONFIRM           / request-meteo     / condMeteo
+Reply for birth SUCCESS     / ACCEPT_PROPOSAL   / propose-birth     / X::Y
+Reply for birth REJECT      / REJECT_PROPOSAL   / propose-birth     / 
+Reply for take off SUCCESS  / ACCEPT_PROPOSAL   / propose-takeoff   / 
+Reply for take off REJECT   / REJECT_PROPOSAL   / propose-takeoff   /
+Reply for landing SUCCESS   / ACCEPT_PROPOSAL   / propose-land      / 
+Reply for landing REJECT    / REJECT_PROPOSAL   / propose-land      /
+Inform of meteo change      / INFORM            / info-meteo        / condMeteo
+
+AirPlane <-> AirPlane
+
+Action / Performative / Ontology / Content
+
+Request info                / REQUEST       / request-info   /
+Reply with info             / CONFIRM       / request-pos   / X::Y::nPassageiros::distPercorrida::velocidade
+...
+
+
+
+AirPlane <-> Interface
+
+Action / Performative / Ontology / Content
+Airplane:
+Inform of birth            / INFORM        / inform-birth       / AID::X::Y::nPassageiros::origin
+Inform of colision         / INFORM        / inform-colision    / AID::X::Y
+Inform of state            / INFORM        / inform-state       / AID::X::Y::distPercorrida::distPrevista::velocidade
+Inform of decision         / INFORM        / inform-decision    / AID::X::Y::decision
+

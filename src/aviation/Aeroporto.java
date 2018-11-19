@@ -1,6 +1,7 @@
 package aviation;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import jade.core.AID;
 import jade.core.Agent;
@@ -11,7 +12,9 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 
 public class Aeroporto extends Agent{
 	
-	private Posicao posicao;
+	// CondMeteo: 0-> chuva, 1->sol, 2->nublado, 3->tempestadão
+	
+	private Position posicao;
 	private int nPistasAterragem, nLimiteAero, nAeroEstacionadas, condMeteo;
 	private ArrayList<AID> interessadasMeteo;
 	private ArrayList<AID> pedidosDescolagem;
@@ -19,6 +22,12 @@ public class Aeroporto extends Agent{
 	
 	@Override
 	protected void setup() {
+		
+		Random rand = new Random();
+		condMeteo = rand.nextInt(3); // Entre 0 e 2
+		nPistasAterragem = rand.nextInt(3); // Entre 0 e 2
+		nLimiteAero = rand.nextInt(11)+10; // Entre 10 e 20
+		nAeroEstacionadas = 0;
 		
 		
 		DFAgentDescription dfd = new DFAgentDescription();
