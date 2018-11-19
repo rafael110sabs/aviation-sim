@@ -28,7 +28,7 @@ AirPlane <-> AirPlane
 Action / Performative / Ontology / Content
 
 Request info                / REQUEST       / request-info   /
-Reply with info             / CONFIRM       / request-pos   / X::Y::nPassageiros::distPercorrida::velocidade
+Reply with info             / CONFIRM       / request-info   / X::Y::nPassageiros::distPercorrida::velocidade
 ...
 
 
@@ -41,4 +41,7 @@ Inform of birth            / INFORM        / inform-birth       / AID::X::Y::nPa
 Inform of colision         / INFORM        / inform-colision    / AID::X::Y
 Inform of state            / INFORM        / inform-state       / AID::X::Y::distPercorrida::distPrevista::velocidade
 Inform of decision         / INFORM        / inform-decision    / AID::X::Y::decision
+Reply with state           / CONFIRM       / request-state      / AID::X::Y::distPercorrida::distPrevista::velocidade
 
+Interface:
+Request airplane state     / REQUEST       / request-state      /
