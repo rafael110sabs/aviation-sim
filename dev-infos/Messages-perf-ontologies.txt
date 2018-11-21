@@ -14,14 +14,12 @@ Inform of colision          / INFORM    / info-colision     / X::Y
 
 Airport:
 Reply with position         / CONFIRM           / request-pos       / X::Y
-Reply with meteo            / CONFIRM           / request-meteo     / condMeteo
 Reply for birth SUCCESS     / ACCEPT_PROPOSAL   / propose-birth     / X::Y
 Reply for birth REJECT      / REJECT_PROPOSAL   / propose-birth     / 
-Reply for take off SUCCESS  / ACCEPT_PROPOSAL   / propose-takeoff   / 
-Reply for take off REJECT   / REJECT_PROPOSAL   / propose-takeoff   /
+Reply for take off SUCCESS  / ACCEPT_PROPOSAL   / propose-takeoff   /
 Reply for landing SUCCESS   / ACCEPT_PROPOSAL   / propose-land      / 
 Reply for landing REJECT    / REJECT_PROPOSAL   / propose-land      /
-Inform of meteo change      / INFORM            / info-meteo        / condMeteo
+Inform of meteo             / INFORM            / info-meteo        / X::Y::condMeteo
 
 AirPlane <-> AirPlane
 
