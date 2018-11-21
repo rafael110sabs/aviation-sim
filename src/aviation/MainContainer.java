@@ -47,9 +47,9 @@ public class MainContainer {
 
 	}
 
-	public void startAgentInPlatform(String name, String classpath) {
+	public void startAgentInPlatform(String name, String classpath, Object[] arguments) {
 		try {
-			AgentController ac = container.createNewAgent(name, classpath, new Object[0]);
+			AgentController ac = container.createNewAgent(name, classpath, arguments);
 			ac.start();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -59,7 +59,19 @@ public class MainContainer {
 	public static void main(String[] args) throws InterruptedException {
 		MainContainer a = new MainContainer();
 		a.initMainContainerInPlatform("localhost", "9888", "MainContainer");
-        //a.startAgentInPlatform("DI-Sensor", "ficha5.TemperatureSensorAgent");
+		int ap = 0;
+	    
+	    for(int i = 0; i < 1000; i+=249) {
+	    	for(int j = 0; j < 1000; j+=249) {
+	    	    a.startAgentInPlatform("Aeroporto-"+ap, "aviation.Aeroporto", new Object[] {i,j});
+	    	    ap++;
+	    	}
+	    }
+	    
+	    for(int i = 0; i < 5; i++) {
+	    	a.startAgentInPlatform("Aeronave"+i, "aviation.Aeronave", new Object[] {});	
+	    }
+	    //a.startAgentInPlatform("DI-Sensor", "ficha5.TemperatureSensorAgent");
 		
 		
 		

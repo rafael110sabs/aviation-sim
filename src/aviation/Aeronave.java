@@ -135,7 +135,9 @@ public class Aeronave extends Agent{
 					destino = aeroportos.get(rand.nextInt(aeroportos.size()));
 					onlyOrigin = true;
 				}
-			} while(aeroportoAtual != destino);
+			} while(aeroportoAtual == destino);
+			
+			System.out.println(aeroportoAtual.getLocalName() + " -> " + destino.getLocalName());
 			
 			//Send the request to the picked origin airport
 			ACLMessage request = new ACLMessage(ACLMessage.PROPOSE);
@@ -145,11 +147,11 @@ public class Aeronave extends Agent{
 			myAgent.send(request);
 			
 			//Wait for the request
-			MessageTemplate mt1 = MessageTemplate.MatchPerformative(ACLMessage.PROPOSE);
+			//MessageTemplate mt1 = MessageTemplate.MatchPerformative(ACLMessage.PROPOSE);
 			MessageTemplate mt2 = MessageTemplate.MatchOntology("propose-birth");
-			MessageTemplate mt3 = MessageTemplate.and(mt1, mt2);
+			//MessageTemplate mt3 = MessageTemplate.and(mt1, mt2);
 			
-			ACLMessage reply = blockingReceive(mt3);
+			ACLMessage reply = blockingReceive(mt2);
 			if(reply != null) {
 				if(reply.getPerformative() == ACLMessage.ACCEPT_PROPOSAL) {
 					// If it proposal is accepted
@@ -161,6 +163,7 @@ public class Aeronave extends Agent{
 					mapa.setAirport(pos, airport, false);
 					posicao = pos;
 					found = true;
+					System.out.println(""+myAgent.getLocalName()+" has born in " + airport.getLocalName());
 				}
 				// else found still's false
 			}
@@ -287,14 +290,13 @@ public class Aeronave extends Agent{
 			if(reply != null) {
 				String ontology = reply.getOntology();
 				if(ontology == "request-pos") {
-					
 					//Process airport position request
 					AID airport = reply.getSender();
 					String[] content_split = reply.getContent().split("::");
 					int x = Integer.parseInt(content_split[0]);
 					int y = Integer.parseInt(content_split[1]);
 					Position pos = new Position(x,y);
-					if(airport == destino) {
+					if(airport.equals(destino)) {
 						mapa.setAirport(pos, airport, false);
 						pos_destino = pos;
 					}else

@@ -21,7 +21,7 @@ public class Map {
 	}
 	
 	public void setAirport(Position pos, AID id, boolean restricted) {
-		map[pos.getX()][pos.getY()] = 1;
+		map[pos.getX()][pos.getY()] = 0;
 		setTerritory(pos,id);
 		if(restricted) {
 			setRestrictedZone(pos);
@@ -32,8 +32,7 @@ public class Map {
 		Node initialNode = new Node(atual_pos.getX(), atual_pos.getY());
         Node finalNode = new Node(dest_pos.getX(), dest_pos.getY());
         int rows = MAP_SIZE, cols = MAP_SIZE;
-        AStar aStar = new AStar(rows, cols, map, initialNode, finalNode);
-       
+        AStar aStar = new AStar(rows, cols, map, initialNode, finalNode, 1, 2);
         List<Node> path = aStar.findPath();
         ArrayList<Position> pos = new ArrayList<Position>();
         for (Node node : path) {
@@ -85,10 +84,12 @@ public class Map {
 		int x = pos.getX()-(RESTRICTED_ZONE/2), y = pos.getY()-(RESTRICTED_ZONE/2);
 		for(int i = 0; i < RESTRICTED_ZONE; i++) {
 			for(int j = 0; j < RESTRICTED_ZONE; j++) {
-				if(x+i >= 0 && y+i >= 0 && x+1 < MAP_SIZE && y+1 < MAP_SIZE)
-					map[x+i][y+i]= 1;
+				//System.out.println((x+i) + " " + (y+j));
+				if(x+i >= 0 && y+j >= 0 && x+i < MAP_SIZE && y+j < MAP_SIZE)
+					map[x+i][y+j]= 1;
 			}
 		}
+		//System.out.println("Airport positioned at" +pos.getX()+ " " + pos.getY());
 	}
 
 }

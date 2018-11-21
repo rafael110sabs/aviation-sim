@@ -27,6 +27,8 @@ public class Aeroporto extends Agent {
 
 	@Override
 	protected void setup() {
+		Object[] args = getArguments();
+		posicao = new Position((int) args[0],(int) args[1]);
 
 		Random rand = new Random();
 		condMeteo = rand.nextInt(4); // Entre 0 e 2
@@ -34,6 +36,9 @@ public class Aeroporto extends Agent {
 		nLimiteAero = rand.nextInt(11)+10; // Entre 10 e 20
 		nAeroEstacionadas = 0;
 		nPistasDisponiveis = nPistasAterragem;
+		interessadasMeteo = new ArrayList<AID>();
+		pedidosDescolagem = new ArrayList<AID>();
+		pedidosAterragem = new ArrayList<AID>();
 
 
 		DFAgentDescription dfd = new DFAgentDescription();
@@ -49,7 +54,7 @@ public class Aeroporto extends Agent {
 			DFService.register(this, dfd);
 
 			this.addBehaviour(new PositionRequest());
-			this.addBehaviour(new ParkingRequest())
+			this.addBehaviour(new ParkingRequest());
 			this.addBehaviour(new TakeoffRequest());
 			this.addBehaviour(new TakeoffClearance());
 			this.addBehaviour(new TakeoffInform());
@@ -68,7 +73,7 @@ public class Aeroporto extends Agent {
 		@Override
 		public void action() {
 			MessageTemplate mt1 = MessageTemplate.MatchPerformative(ACLMessage.REQUEST);
-			MessageTemplate mt2 = MessageTemplate.MatchOntology("propose-pos");
+			MessageTemplate mt2 = MessageTemplate.MatchOntology("request-pos");
 			MessageTemplate mt3 = MessageTemplate.and(mt1, mt2);
 
 			ACLMessage msg = receive(mt3);
@@ -77,11 +82,11 @@ public class Aeroporto extends Agent {
 				AID aeronave = msg.getSender();
 				ACLMessage reply = msg.createReply();
 				reply.setPerformative(ACLMessage.CONFIRM);
-				reply.setOntology("resquest-pos");
+				reply.setOntology("request-pos");
 				reply.setContent(posicao.getX() + "::" + posicao.getY());
-				reply.addReceiver(aeronave);
 				myAgent.send(reply);
-			}
+			} else
+				block();
 		}
 	}
 
@@ -93,7 +98,7 @@ public class Aeroporto extends Agent {
 			MessageTemplate mt3 = MessageTemplate.and(mt1, mt2);
 
 			ACLMessage msg = receive(mt3);
-
+			
 			if(msg != null) {
 				AID aeronave = msg.getSender();
 				ACLMessage reply = msg.createReply();
@@ -101,6 +106,7 @@ public class Aeroporto extends Agent {
 				if(nAeroEstacionadas < nLimiteAero) {
 					reply.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
 					reply.setOntology("propose-birth");
+					reply.setContent(posicao.getX() + "::" + posicao.getY());
 					reply.addReceiver(aeronave);
 					myAgent.send(reply);
 					nAeroEstacionadas++;
@@ -111,7 +117,8 @@ public class Aeroporto extends Agent {
 					reply.addReceiver(aeronave);
 					myAgent.send(reply);
 				}
-			}
+			}else
+				block();
 		}
 	}
 
@@ -128,7 +135,8 @@ public class Aeroporto extends Agent {
 			if(msg != null) {
 				AID aeronave = msg.getSender();
 				pedidosDescolagem.add(aeronave);
-			}
+			} else
+				block();
 		}
 	}
 
@@ -154,7 +162,8 @@ public class Aeroporto extends Agent {
 					myAgent.send(reject_takeoff);
 					pedidosDescolagem.remove(aeronave);
 				}
-			}
+			} else
+				block();
 
 		}
 	}
@@ -170,6 +179,8 @@ public class Aeroporto extends Agent {
 
 			if(msg != null)
 				nPistasDisponiveis++;
+			else
+				block();
 		}
 	}
 
@@ -186,7 +197,8 @@ public class Aeroporto extends Agent {
 			if(msg != null) {
 				AID aeronave = msg.getSender();
 				pedidosAterragem.add(aeronave);
-			}
+			} else
+				block();
 		}
 	}
 
@@ -201,7 +213,8 @@ public class Aeroporto extends Agent {
 				accept_landing.addReceiver(aeronave);
 				myAgent.send(accept_landing);
 				pedidosAterragem.remove(aeronave);
-			}
+			}else
+				block();
 		}
 	}
 
@@ -216,6 +229,8 @@ public class Aeroporto extends Agent {
 
 			if(msg != null)
 				nPistasDisponiveis++;
+			else
+				block();
 		}
 	}
 
@@ -237,7 +252,8 @@ public class Aeroporto extends Agent {
 				reply.setContent("" + condMeteo);
 				reply.addReceiver(aeronave);
 				myAgent.send(reply);
-			}
+			}else
+				block();
 		}
 	}
 
