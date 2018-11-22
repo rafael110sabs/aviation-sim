@@ -24,7 +24,7 @@ Inform of meteo             / INFORM            / info-meteo        / X::Y::cond
 AirPlane <-> AirPlane
 
 Action / Performative / Ontology / Content
-
+Airplane:
 Request info                / REQUEST       / request-info   /
 Reply with info             / CONFIRM       / request-info   / X::Y::nPassageiros::distPercorrida::velocidade
 ...
@@ -35,6 +35,8 @@ AirPlane <-> Interface
 
 Action / Performative / Ontology / Content
 Airplane:
+Inform of takeoff          / INFORM        / inform-takeoff     /
+Inform of landing          / INFORM        / inform-land        /
 Inform of birth            / INFORM        / inform-birth       / AID::X::Y::nPassageiros::origin
 Inform of colision         / INFORM        / inform-colision    / AID::X::Y
 Inform of state            / INFORM        / inform-state       / AID::X::Y::distPercorrida::distPrevista::velocidade

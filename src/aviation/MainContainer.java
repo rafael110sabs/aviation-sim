@@ -68,7 +68,7 @@ public class MainContainer {
 	    	}
 	    }
 	    
-	    for(int i = 0; i < 5; i++) {
+	    for(int i = 0; i < 3; i++) {
 	    	a.startAgentInPlatform("Aeronave"+i, "aviation.Aeronave", new Object[] {});	
 	    }
 	    //a.startAgentInPlatform("DI-Sensor", "ficha5.TemperatureSensorAgent");

@@ -207,12 +207,17 @@ public class Aeroporto extends Agent {
 		public void action() {
 
 			if(!pedidosAterragem.isEmpty()) {
-				AID aeronave = pedidosAterragem.get(0);
-				ACLMessage accept_landing = new ACLMessage(ACLMessage.ACCEPT_PROPOSAL);
-				accept_landing.setOntology("propose-land");
-				accept_landing.addReceiver(aeronave);
-				myAgent.send(accept_landing);
-				pedidosAterragem.remove(aeronave);
+				if(nPistasDisponiveis > 0) {
+					nPistasDisponiveis--;
+					AID aeronave = pedidosAterragem.get(0);
+					ACLMessage accept_landing = new ACLMessage(ACLMessage.ACCEPT_PROPOSAL);
+					accept_landing.setOntology("propose-land");
+					accept_landing.addReceiver(aeronave);
+					myAgent.send(accept_landing);
+					pedidosAterragem.remove(aeronave);
+				} else {
+					block();
+				}
 			}else
 				block();
 		}

@@ -37,7 +37,7 @@ public class Map {
         ArrayList<Position> pos = new ArrayList<Position>();
         for (Node node : path) {
             Position p = new Position(node.getRow(), node.getCol());
-            pos.add(p);
+            pos.add(pos.size(),p);
         }
         return pos;
 	}
@@ -62,7 +62,7 @@ public class Map {
 		}
 	}
 	
-	private AID getTerritory(Position pos) {
+	public AID getTerritory(Position pos) {
 		return  territory[pos.getX()][pos.getY()];
 	}
 	
