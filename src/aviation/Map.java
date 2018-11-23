@@ -8,9 +8,9 @@ import jade.core.AID;
 
 public class Map {
 	
-	private final int TERRI_LENGTH = 200;
-	private final int RESTRICTED_ZONE = 60;
-	private final int MAP_SIZE = 1000;
+	private final int TERRI_LENGTH = 120;
+	private final int RESTRICTED_ZONE = 20;
+	private final int MAP_SIZE = 481;
 	private int[][] map;
 	private AID[][] territory;
 	
@@ -21,7 +21,6 @@ public class Map {
 	}
 	
 	public void setAirport(Position pos, AID id, boolean restricted) {
-		map[pos.getX()][pos.getY()] = 0;
 		setTerritory(pos,id);
 		if(restricted) {
 			setRestrictedZone(pos);
@@ -70,12 +69,13 @@ public class Map {
 	 * Change the corresponding territory to restricted.
 	 * @param pos
 	 */
-	public void setBadWeather(Position pos) {
+	public void setWeather(Position pos, boolean bad) {
 		int x = pos.getX()-(TERRI_LENGTH/2), y = pos.getY()-(TERRI_LENGTH/2);
 		for(int i = 0; i < TERRI_LENGTH; i++) {
 			for(int j = 0; j < TERRI_LENGTH; j++) {
 				if(x+i >= 0 && y+j >= 0 && x+i < MAP_SIZE && y+j < MAP_SIZE)
-					map[x+i][y+j] = 1;
+					if(bad)
+						map[x+i][y+j] = 1;
 			}
 		}
 	}

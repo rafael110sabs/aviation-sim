@@ -61,8 +61,8 @@ public class MainContainer {
 		a.initMainContainerInPlatform("localhost", "9888", "MainContainer");
 		int ap = 0;
 	    
-	    for(int i = 0; i < 1000; i+=249) {
-	    	for(int j = 0; j < 1000; j+=249) {
+	    for(int i = 0; i <= 480; i+=120) {
+	    	for(int j = 0; j <= 480; j+=120) {
 	    	    a.startAgentInPlatform("Aeroporto-"+ap, "aviation.Aeroporto", new Object[] {i,j});
 	    	    ap++;
 	    	}

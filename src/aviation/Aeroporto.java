@@ -31,8 +31,8 @@ public class Aeroporto extends Agent {
 		posicao = new Position((int) args[0],(int) args[1]);
 
 		Random rand = new Random();
-		condMeteo = rand.nextInt(4); // Entre 0 e 2
-		nPistasAterragem = rand.nextInt(3) + 1; // Entre 0 e 2
+		condMeteo = rand.nextInt(4); // Entre 0 e 3
+		nPistasAterragem = rand.nextInt(3) + 1; // Entre 1 e 2
 		nLimiteAero = rand.nextInt(11)+10; // Entre 10 e 20
 		nAeroEstacionadas = 0;
 		nPistasDisponiveis = nPistasAterragem;
@@ -252,11 +252,11 @@ public class Aeroporto extends Agent {
 			if(msg != null) {
 				AID aeronave = msg.getSender();
 				ACLMessage reply = msg.createReply();
-				reply.setPerformative(ACLMessage.CONFIRM);
-				reply.setOntology("request-meteo");
-				reply.setContent("" + condMeteo);
-				reply.addReceiver(aeronave);
+				reply.setPerformative(ACLMessage.INFORM);
+				reply.setOntology("info-meteo");
+				reply.setContent(posicao.getX()+"::" + posicao.getY()+"::"+condMeteo);
 				myAgent.send(reply);
+				interessadasMeteo.add(aeronave);
 			}else
 				block();
 		}
@@ -264,20 +264,25 @@ public class Aeroporto extends Agent {
 
 	class InformMeteoChange extends TickerBehaviour {
 		public InformMeteoChange(Agent a){
-			super(a,1000);
+			super(a,5000);
 		}
 
 		@Override
 		public void onTick() {
 			Random rand = new Random();
-			condMeteo = rand.nextInt(4);
-			for(int i = 0; i < interessadasMeteo.size(); i++) {
-				AID aeronave = interessadasMeteo.get(i);
-				ACLMessage msg  = new ACLMessage(ACLMessage.INFORM);
-				msg.setOntology("info-meteo");
-				msg.setContent("" + condMeteo);
-				msg.addReceiver(aeronave);
-				myAgent.send(msg);
+			int newMeteo = rand.nextInt(4);
+			
+			//Only notify notory changes.
+			if(((condMeteo == 0 || condMeteo == 1 || condMeteo == 2) && newMeteo == 3) ||
+					(condMeteo == 3 && (newMeteo == 0 || newMeteo == 1 || newMeteo == 2))) {
+				for(int i = 0; i < interessadasMeteo.size(); i++) {
+					AID aeronave = interessadasMeteo.get(i);
+					ACLMessage msg  = new ACLMessage(ACLMessage.INFORM);
+					msg.setOntology("info-meteo");
+					msg.setContent(posicao.getX()+"::" + posicao.getY()+"::"+condMeteo);
+					msg.addReceiver(aeronave);
+					myAgent.send(msg);
+				}
 			}
 		}
 	}

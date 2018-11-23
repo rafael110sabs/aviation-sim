@@ -2,6 +2,7 @@ package aviation;
 
 import java.awt.PageAttributes.OriginType;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
 
 import jade.core.*;
@@ -25,7 +26,7 @@ public class Aeronave extends Agent{
 	private AID aeroportoAtual;
 	private int nPassageiros, distPercorrida, velocidade, distPrevista;
 	private double alertZone, protectedZone ;
-	//private ArrayList<Integer> condMeteo;
+	private HashMap<AID,Integer> condMeteoMap;
 	private Position posicao;
 	private Position pos_destino;
 	private ArrayList<AID> aeroportos;
@@ -33,6 +34,8 @@ public class Aeronave extends Agent{
 	private long tempoPartida, tempoVoo;
 	private AID agent_interface;
 	private int land_permission; // 0 -> no, 1->yes, 2->on hold
+	private boolean changing_route;
+	private boolean first_pass;
 
 	@Override
 	protected void setup() {
@@ -45,6 +48,9 @@ public class Aeronave extends Agent{
 		agent_interface = new AID();
 		agent_interface.setLocalName("Interface");
 		aeroportos = new ArrayList<AID>();
+		condMeteoMap = new HashMap<AID,Integer>();
+		changing_route = false;
+		first_pass = true;
 
 
 
@@ -234,11 +240,38 @@ public class Aeronave extends Agent{
 	}
 
 	class CalculateRouteBehav extends OneShotBehaviour{
-
+		
 		@Override
 		public void action() {
+			changing_route = true;
 			rota = mapa.calculateRoute(posicao, pos_destino);
 			distPrevista = rota.size();
+			changing_route = false;
+			
+			if(first_pass) {
+				//Get weather on route
+				//Only after the first route calculation
+				Position init;
+				AID lastTerritory = aeroportoAtual;
+				AID thisTerritory;
+				ACLMessage meteo = new ACLMessage(ACLMessage.REQUEST);
+				meteo.setOntology("request-meteo");
+				meteo.setConversationId(""+System.currentTimeMillis());
+				
+				for(int i = 20; i < rota.size(); i+=20) {
+					init = rota.get(i);
+					thisTerritory = mapa.getTerritory(init);
+					if(thisTerritory != null && !thisTerritory.equals(lastTerritory)) {
+						meteo.addReceiver(thisTerritory);
+						lastTerritory = thisTerritory;
+						condMeteoMap.put(thisTerritory, 0);
+					}
+				}
+				System.out.println(condMeteoMap.size());
+				myAgent.send(meteo);
+				first_pass = false;
+			}
+			
 		}
 
 	}
@@ -297,15 +330,17 @@ public class Aeronave extends Agent{
 
 		@Override
 		protected void onTick() {
-
-			if((distPrevista - distPercorrida ) > 60) {
-				myAgent.addBehaviour(new BeaconBehav());
-				myAgent.addBehaviour(new MovePositionBehav());
-			} else {
-				if(land_permission == 2)
-					myAgent.addBehaviour(new WaitLandingBehav());
-				else if(land_permission == 1)
-					myAgent.addBehaviour(new StartLandingBehav());
+			
+			if(!changing_route) {
+				if((distPrevista - distPercorrida ) > 60) {
+					myAgent.addBehaviour(new BeaconBehav());
+					myAgent.addBehaviour(new MovePositionBehav());
+				} else {
+					if(land_permission == 2)
+						myAgent.addBehaviour(new WaitLandingBehav());
+					else if(land_permission == 1)
+						myAgent.addBehaviour(new StartLandingBehav());
+				}
 			}
 		}
 
@@ -392,10 +427,6 @@ public class Aeronave extends Agent{
 			} catch(Exception e){
 				e.printStackTrace();
 			}
-		}
-
-		private double calculateDistance(float dc_x, float dc_y, float dt_x, float dt_y){
-			return Math.sqrt(Math.pow((dt_x - dc_x), 2) + Math.pow((dt_y - dc_y), 2));
 		}
 
 		private boolean calculateAutority(int p, int d, int v, int x, int y) {
@@ -493,6 +524,7 @@ public class Aeronave extends Agent{
 	class ProcessAirportReplies extends CyclicBehaviour{
 
 		private int nr_airports_inserted = 0;
+		private int nr_meteo_received = 0;
 
 		@Override
 		public void action() {
@@ -544,16 +576,35 @@ public class Aeronave extends Agent{
 					String[] content = reply.getContent().split("::");
 
 					int meteo = Integer.parseInt(content[2]);
-					if(meteo == 3) {
-						int x = Integer.parseInt(content[1]);
-						int y = Integer.parseInt(content[1]);
-						Position pos = new Position(x,y);
-						mapa.setBadWeather(pos);
+					if(!airport.equals(destino)) {
+						if(meteo == 3) {
+							int x = Integer.parseInt(content[1]);
+							int y = Integer.parseInt(content[1]);
+							Position pos = new Position(x,y);
+							mapa.setWeather(pos,true);
+						} else {
+							int x = Integer.parseInt(content[1]);
+							int y = Integer.parseInt(content[1]);
+							Position pos = new Position(x,y);
+							mapa.setWeather(pos,false);
+						}
+					}
+					condMeteoMap.replace(airport, meteo);
+					nr_meteo_received++;
+					
+					if(nr_meteo_received >= condMeteoMap.size()) {
+						//To make the route recalculation only after receiving meteo from every airport on path
+						myAgent.addBehaviour(new CalculateRouteBehav());
+						System.out.println(myAgent.getLocalName()+ " Meteorology changed: route recalculation.");
 					}
 				}
 			} else {
 				block();
 			}
 		}
+	}
+	
+	private double calculateDistance(float dc_x, float dc_y, float dt_x, float dt_y){
+		return Math.sqrt(Math.pow((dt_x - dc_x), 2) + Math.pow((dt_y - dc_y), 2));
 	}
 }
