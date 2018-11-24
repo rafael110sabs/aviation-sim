@@ -21,14 +21,13 @@ public class Interface extends Agent{
 	com os AAs como forma de observar o status e tomada de decisão das aeronaves*/
 	
 	private ArrayList<AID> aeroportos, aeronaves;	
-	
+	//criação e invocaçao do objeto painel.
+    Panel texto=new Panel();	
 	@Override
 	protected void setup() {
 		
 		aeroportos = new ArrayList<AID>();
 		aeronaves = new ArrayList<AID>();
-		Panel texto=new Panel();	
-		texto.main(null);
 		DFAgentDescription dfd = new DFAgentDescription();
         dfd.setName(getAID());
         ServiceDescription sd = new ServiceDescription();
@@ -37,7 +36,7 @@ public class Interface extends Agent{
         
         dfd.addServices(sd);
         
-        
+        texto.main(null);
         try {
             
             DFService.register(this, dfd);
@@ -48,12 +47,11 @@ public class Interface extends Agent{
             this.addBehaviour(new InfoCollision());
             this.addBehaviour(new InfoState());
             this.addBehaviour(new InfoDecision());
+            this.addBehaviour(new GetCommand());
             
         } catch (FIPAException e) {
             e.printStackTrace();
         }
-        
-
 	}
 	
 	@Override
@@ -67,59 +65,33 @@ public class Interface extends Agent{
 		}
 	}
 	
-	/*private  PieDataset createDataset() {
-	   	
-        DefaultPieDataset result = new DefaultPieDataset();
-        
-        //////////
-        DFAgentDescription template = new DFAgentDescription();
-        ServiceDescription sd = new ServiceDescription();
-        sd.setType("estacao");
-        sd.setName("Aeroporto");
-        template.addServices(sd);
-        
-        DFAgentDescription[] resultado;
-        
-        try {
-            
-        	resultado = DFService.search(myAgent, template);
-            int nr_aeroportos = resultado.length;
-            
-            for(int i = 0; i < nr_aeroportos; i++){
-            	
-            	aeroportos.add(resultado[i].getName());
-            	
-            }
-        } catch(Exception e){
-            e.printStackTrace();
-        ////////////
-            
-        result.setValue("Linux", 29);
-        result.setValue("Mac", 20);
-        result.setValue("Windows", 51);
-        return result;
 
-        }
+	
+	private class GetCommand extends CyclicBehaviour {
+		public void action() {
+			String command=texto.SendCommand();
+			String nave="Aeronave"+command.split(" ")[1];
+			
+			/*
+			 * Falta converter o texto em um AID para procurar no DF e devolver a mensagem a mostrar.
+			 */
+			
+			
+		try { //tenta encontrar nave	
+		}
+		catch(Exception e)
+		{
+			System.out.println(e.toString());
+		}
+		ACLMessage request = new ACLMessage(ACLMessage.REQUEST);
+		request.setOntology("request-state");
+		request.setConversationId(""+ System.currentTimeMillis());
+		request.addReceiver(reciever);
+		send(request);
+				
+		}
 	}
 	
-	class  makeChart extends SimpleBehaviour{
-		@Override
-		public void action() {
-		PieDataset data=createDataset();
-		PieChart naves = new PieChart(data,"Aeronaves", "Quantas aeronaves em voo e paradas?");
-		naves.pack();
-		naves.setVisible(true);
-		// TODO Auto-generated method stub
-	}
-
-				@Override
-				public boolean done() {
-					// TODO Auto-generated method stub
-					return false;
-				}
-
-	}
-	*/
 	private class InfoBirth extends CyclicBehaviour {
 		public void action() {
 			MessageTemplate mt1 = MessageTemplate.MatchOntology("inform-birth");
