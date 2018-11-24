@@ -157,12 +157,12 @@ public class Aeroporto extends Agent {
 				}
 				else {
 					System.out.println(myAgent.getLocalName() + ": No airstrips available.");
-					AID aeronave = pedidosDescolagem.get(0);
-					ACLMessage reject_takeoff = new ACLMessage(ACLMessage.REJECT_PROPOSAL);
-					reject_takeoff.setOntology("propose-takeoff");
-					reject_takeoff.addReceiver(aeronave);
-					myAgent.send(reject_takeoff);
-					pedidosDescolagem.remove(aeronave);
+//					AID aeronave = pedidosDescolagem.get(0);
+//					ACLMessage reject_takeoff = new ACLMessage(ACLMessage.REJECT_PROPOSAL);
+//					reject_takeoff.setOntology("propose-takeoff");
+//					reject_takeoff.addReceiver(aeronave);
+//					myAgent.send(reject_takeoff);
+//					pedidosDescolagem.remove(aeronave);
 				}
 			} else
 				block(5000);
