@@ -8,7 +8,7 @@ import jade.core.AID;
 
 public class Map {
 	
-	private final int TERRI_LENGTH = 120;
+	private final int TERRI_LENGTH = 80;
 	private final int RESTRICTED_ZONE = 20;
 	private final int MAP_SIZE = 481;
 	private int[][] map;

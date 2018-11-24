@@ -61,14 +61,14 @@ public class MainContainer {
 		a.initMainContainerInPlatform("localhost", "9888", "MainContainer");
 		int ap = 0;
 	    
-	    for(int i = 0; i <= 480; i+=120) {
-	    	for(int j = 0; j <= 480; j+=120) {
+	    for(int i = 0; /*i <= 480*/ i <= 120; i+=120) {
+	    	for(int j = 0; /*j <= 480*/ j<= 120; j+=120) {
 	    	    a.startAgentInPlatform("Aeroporto-"+ap, "aviation.Aeroporto", new Object[] {i,j});
 	    	    ap++;
 	    	}
 	    }
 	    
-	    for(int i = 0; i < 3; i++) {
+	    for(int i = 0; i < 2; i++) {
 	    	a.startAgentInPlatform("Aeronave"+i, "aviation.Aeronave", new Object[] {});	
 	    }
 	    //a.startAgentInPlatform("DI-Sensor", "ficha5.TemperatureSensorAgent");

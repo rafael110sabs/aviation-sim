@@ -133,6 +133,7 @@ public class Aeroporto extends Agent {
 			ACLMessage msg = receive(mt3);
 
 			if(msg != null) {
+				System.out.println(myAgent.getLocalName() + ": got a takeoff request");
 				AID aeronave = msg.getSender();
 				pedidosDescolagem.add(aeronave);
 			} else
@@ -155,6 +156,7 @@ public class Aeroporto extends Agent {
 					pedidosDescolagem.remove(aeronave);
 				}
 				else {
+					System.out.println(myAgent.getLocalName() + ": No airstrips available.");
 					AID aeronave = pedidosDescolagem.get(0);
 					ACLMessage reject_takeoff = new ACLMessage(ACLMessage.REJECT_PROPOSAL);
 					reject_takeoff.setOntology("propose-takeoff");
@@ -163,7 +165,7 @@ public class Aeroporto extends Agent {
 					pedidosDescolagem.remove(aeronave);
 				}
 			} else
-				block();
+				block(5000);
 
 		}
 	}
@@ -195,6 +197,7 @@ public class Aeroporto extends Agent {
 			ACLMessage msg = receive(mt3);
 
 			if(msg != null) {
+				System.out.println(myAgent.getLocalName() + ": got a landing request");
 				AID aeronave = msg.getSender();
 				pedidosAterragem.add(aeronave);
 			} else
@@ -215,11 +218,10 @@ public class Aeroporto extends Agent {
 					accept_landing.addReceiver(aeronave);
 					myAgent.send(accept_landing);
 					pedidosAterragem.remove(aeronave);
-				} else {
-					block();
-				}
-			}else
-				block();
+				} else
+					System.out.println(myAgent.getLocalName() + ": No airstrips available.");
+			}
+			block(5000);
 		}
 	}
 
@@ -264,7 +266,7 @@ public class Aeroporto extends Agent {
 
 	class InformMeteoChange extends TickerBehaviour {
 		public InformMeteoChange(Agent a){
-			super(a,5000);
+			super(a,10000);
 		}
 
 		@Override
