@@ -78,17 +78,46 @@ public class Interface extends Agent{
 			
 			
 		try { //tenta encontrar nave	
+			
+			
+			
+			ACLMessage request = new ACLMessage(ACLMessage.REQUEST);
+			request.setOntology("request-state");
+			request.setConversationId(""+ System.currentTimeMillis());
+			request.addReceiver(reciever);
+			send(request);
+			
+			
 		}
 		catch(Exception e)
 		{
 			System.out.println(e.toString());
 		}
-		ACLMessage request = new ACLMessage(ACLMessage.REQUEST);
-		request.setOntology("request-state");
-		request.setConversationId(""+ System.currentTimeMillis());
-		request.addReceiver(reciever);
-		send(request);
+		
 				
+		}
+	}
+	
+	private class GetState extends CyclicBehaviour {
+		public void action() {
+			MessageTemplate mt1 = MessageTemplate.MatchOntology("inform-state");
+			MessageTemplate mt2 = MessageTemplate.MatchPerformative(ACLMessage.REQUEST);
+			MessageTemplate mt3 = MessageTemplate.and(mt1,mt2);
+			ACLMessage info = receive(mt3);
+			
+			if (info!=null) { 
+
+				String[] parts = info.getContent().split("::");
+				String detalhes=
+						"Posição X:" + parts[1] + 
+						" Y:" + parts[2] + 
+						".Distância Percorrida:"+parts[3]+
+						". Distância Prevista:"+ parts[4]+
+						".Velocidade:"+parts[5];
+				System.out.println("INTERFACE -> A nave: " + info.getSender().getLocalName()+" "+ parts[0] + "está ->"
+						+ detalhes );
+			}
+
 		}
 	}
 	

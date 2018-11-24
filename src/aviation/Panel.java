@@ -44,7 +44,14 @@ public class Panel extends JPanel implements ActionListener {
     }
     
     public String SendCommand() {
-    	return textField.getText();
+    	String texto=textField.getText();	//envia texto para a interface
+    	return texto;
+    }
+    
+    public void GetState(String estado) {
+    	textArea.append(estado + newline);
+        textField.selectAll();
+        textArea.setCaretPosition(textArea.getDocument().getLength());
     }
 
     /**
