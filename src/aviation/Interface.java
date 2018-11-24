@@ -21,8 +21,8 @@ public class Interface extends Agent{
 	com os AAs como forma de observar o status e tomada de decisão das aeronaves*/
 	
 	private ArrayList<AID> aeroportos, aeronaves;	
-	//criação e invocaçao do objeto painel.
-    Panel texto=new Panel();	
+	//criação do objeto painel.
+    Panel panel=new Panel();	
 	@Override
 	protected void setup() {
 		
@@ -35,8 +35,8 @@ public class Interface extends Agent{
         sd.setName("Interface");
         
         dfd.addServices(sd);
-        
-        texto.main(null);
+        //invocaçao do painel
+        panel.main(null);
         try {
             
             DFService.register(this, dfd);
@@ -69,7 +69,7 @@ public class Interface extends Agent{
 	
 	private class GetCommand extends CyclicBehaviour {
 		public void action() {
-			String command=texto.SendCommand();
+			String command=panel.SendCommand();
 			String nave="Aeronave"+command.split(" ")[1];
 			
 			/*
@@ -115,6 +115,9 @@ public class Interface extends Agent{
 						". Distância Prevista:"+ parts[4]+
 						".Velocidade:"+parts[5];
 				System.out.println("INTERFACE -> A nave: " + info.getSender().getLocalName()+" "+ parts[0] + "está ->"
+						+ detalhes );
+				//Enviar informaçao para painel
+				panel.GetState("INTERFACE -> A nave: " + info.getSender().getLocalName()+" "+ parts[0] + "está ->"
 						+ detalhes );
 			}
 
