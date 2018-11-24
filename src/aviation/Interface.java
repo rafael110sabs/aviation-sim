@@ -2,6 +2,7 @@ package aviation;
 
 import java.util.ArrayList;
 
+import javax.swing.JTextField;
 
 import org.jfree.data.general.DefaultPieDataset;
 import org.jfree.data.general.PieDataset;
@@ -19,17 +20,15 @@ public class Interface extends Agent{
 	/* com o qual o utilizador vai interagir
 	com os AAs como forma de observar o status e tomada de decisão das aeronaves*/
 	
-	private ArrayList<AID> aeroportos, aeronaves;
-	
-	
+	private ArrayList<AID> aeroportos, aeronaves;	
 	
 	@Override
 	protected void setup() {
 		
 		aeroportos = new ArrayList<AID>();
 		aeronaves = new ArrayList<AID>();
-		
-		
+		Panel texto=new Panel();	
+		texto.main(null);
 		DFAgentDescription dfd = new DFAgentDescription();
         dfd.setName(getAID());
         ServiceDescription sd = new ServiceDescription();
@@ -49,6 +48,7 @@ public class Interface extends Agent{
             this.addBehaviour(new InfoCollision());
             this.addBehaviour(new InfoState());
             this.addBehaviour(new InfoDecision());
+            
         } catch (FIPAException e) {
             e.printStackTrace();
         }
@@ -265,5 +265,4 @@ public class Interface extends Agent{
 		}
 	}*/
 	
-
 }
