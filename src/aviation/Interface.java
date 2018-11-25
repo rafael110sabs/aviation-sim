@@ -21,6 +21,8 @@ public class Interface extends Agent{
 	com os AAs como forma de observar o status e tomada de decisão das aeronaves*/
 	
 	private ArrayList<AID> aeroportos, aeronaves;	
+	private int birthed,takenoff,landed,collision;
+	
 	//criação do objeto painel.
     Panel panel=new Panel();	
 	@Override
@@ -141,6 +143,7 @@ public class Interface extends Agent{
 						". Origem:"+ parts[4];
 				System.out.println("INTERFACE -> A nave originou: " + info.getSender().getLocalName()+" "+ parts[0] + " ->"
 						+ detalhes );
+				birthed++;
 				/*PARA ENVENTUAIS ESTATISTICAS
 				 * String[] parts = info.getContent().split("::");
 				int n_passangers = Integer.parseInt(parts[3]);
@@ -164,6 +167,7 @@ public class Interface extends Agent{
 				String[] parts = info.getContent().split("::");
 				System.out.println("INTERFACE -> A nave "+ parts[0] +" aterrou em -> "
 						+ parts[1]);
+				landed++;
 			}
 
 		}
@@ -182,6 +186,8 @@ public class Interface extends Agent{
 						"Origem:"+parts[1]+
 						" Destino:"+parts[2];
 				System.out.println("INTERFACE -> A nave "+ parts[0] +" descolou -> " + detalhes);
+				takenoff++;
+				
 			}
 
 		}
@@ -200,6 +206,7 @@ public class Interface extends Agent{
 						"Posição X:" + parts[1] + 
 						" Y:"+parts[2];
 				System.out.println("INTERFACE -> A seguinte nave "+parts[0]+" colidiu-> " + detalhes);
+				collision++;
 			}
 
 		}
@@ -246,27 +253,35 @@ public class Interface extends Agent{
 
 		}
 	}
-	
-	/*private class StateRequest  {
+
+	class  StatLandings extends SimpleBehaviour{
+		@Override
 		public void action() {
-			
-			String input = System.console().readLine();
-			int id=Integer.parseInt(input);
-			
-			try { //tenta encontrar nave
-				
-			}
-			catch(Exception e)
-			{
-				System.out.println(e.toString());
-			}
-			
-			ACLMessage request = new ACLMessage(ACLMessage.REQUEST);
-			request.setOntology("request-state");
-			request.setConversationId(""+ System.currentTimeMillis());
-			request.addReceiver(agent_interface);
-			send(request);
-		}
-	}*/
+		PieDataset data=createDataset();
+		PieChart naves = new PieChart(data,"Aeronaves", "Descolagens/Aterragens de aeronaves");
+		naves.pack();
+		naves.setVisible(true);
+		// TODO Auto-generated method stub
+	}
+
+				@Override
+				public boolean done() {
+					// TODO Auto-generated method stub
+					return false;
+				}
+
+	}
 	
+	private  PieDataset createDataset() {
+	   	
+        DefaultPieDataset result = new DefaultPieDataset();  
+            
+        result.setValue("Aeronaves que descolaram", takenoff);
+        result.setValue("Aeronaves que aterraram", landed);
+        result.setValue("Aeronaves que nasceram", birthed);
+        return result;
+
+        }
+	}
+
 }
