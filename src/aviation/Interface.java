@@ -50,6 +50,7 @@ public class Interface extends Agent{
             this.addBehaviour(new InfoState());
             this.addBehaviour(new InfoDecision());
             this.addBehaviour(new GetCommand());
+            this.addBehaviour(new StatLandings());
             
         } catch (FIPAException e) {
             e.printStackTrace();
@@ -83,11 +84,11 @@ public class Interface extends Agent{
 			
 			
 			
-			ACLMessage request = new ACLMessage(ACLMessage.REQUEST);
+			/*ACLMessage request = new ACLMessage(ACLMessage.REQUEST);
 			request.setOntology("request-state");
 			request.setConversationId(""+ System.currentTimeMillis());
 			request.addReceiver(reciever);
-			send(request);
+			send(request);*/
 			
 			
 		}
@@ -276,12 +277,10 @@ public class Interface extends Agent{
 	   	
         DefaultPieDataset result = new DefaultPieDataset();  
             
-        result.setValue("Aeronaves que descolaram", takenoff);
-        result.setValue("Aeronaves que aterraram", landed);
-        result.setValue("Aeronaves que nasceram", birthed);
+        result.setValue("Descolaram", takenoff);
+        result.setValue("Aterraram", landed);
+        result.setValue("Nasceram", birthed);
         return result;
 
         }
-	}
-
 }
