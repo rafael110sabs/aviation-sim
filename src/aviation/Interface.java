@@ -74,17 +74,17 @@ public class Interface extends Agent{
             this.addBehaviour(new FetchAirportsBehav());
             
             //InfoXXX -> get information from other agents
-            this.addBehaviour(new InfoBirth());
+//            this.addBehaviour(new InfoBirth());
             this.addBehaviour(new InfoTakeOff());
             this.addBehaviour(new InfoLanding());
-            this.addBehaviour(new InfoCollision());
+//            this.addBehaviour(new InfoCollision());
             this.addBehaviour(new InfoState());
-            this.addBehaviour(new InfoDecision());
+//            this.addBehaviour(new InfoDecision());
             this.addBehaviour(new InfoAirportState());
             //get command from input
-            this.addBehaviour(new GetCommand());
+            //this.addBehaviour(new GetCommand());
             //create pie chart with stats
-            this.addBehaviour(new StatLandings(this,2000));
+//            this.addBehaviour(new StatLandings(this,2000));
             
         } catch (FIPAException e) {
             e.printStackTrace();
@@ -293,7 +293,7 @@ public class Interface extends Agent{
 						". Distancia Prevista:" +parts[3]+
 						". Velocidade:"+parts[4];
 						
-				System.out.println("INTERFACE -> A nave "+info.getSender().getLocalName()+" esta -> "+detalhes);
+//				System.out.println("INTERFACE -> A nave "+info.getSender().getLocalName()+" esta -> "+detalhes);
 
 				int x = Integer.parseInt(parts[0]);
 				int y = Integer.parseInt(parts[1]);
@@ -367,7 +367,6 @@ public class Interface extends Agent{
 			ACLMessage msg = receive(mt3);
 
 			if(msg != null) {
-				System.out.println("received airport");
 				AID aeroporto = msg.getSender();
 				String[] content_split = msg.getContent().split("::");
 				int x = Integer.parseInt(content_split[0]);
