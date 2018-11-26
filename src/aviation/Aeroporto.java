@@ -6,6 +6,7 @@ import java.util.Random;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
+import jade.core.behaviours.OneShotBehaviour;
 import jade.core.behaviours.TickerBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
@@ -23,7 +24,7 @@ public class Aeroporto extends Agent {
 	private ArrayList<AID> interessadasMeteo;
 	private ArrayList<AID> pedidosDescolagem;
 	private ArrayList<AID> pedidosAterragem;
-
+	private AID agent_interface;
 
 	@Override
 	protected void setup() {
@@ -39,7 +40,8 @@ public class Aeroporto extends Agent {
 		interessadasMeteo = new ArrayList<AID>();
 		pedidosDescolagem = new ArrayList<AID>();
 		pedidosAterragem = new ArrayList<AID>();
-
+		agent_interface = new AID();
+		agent_interface.setLocalName("Interface");
 
 		DFAgentDescription dfd = new DFAgentDescription();
 		dfd.setName(getAID());
@@ -98,7 +100,7 @@ public class Aeroporto extends Agent {
 			MessageTemplate mt3 = MessageTemplate.and(mt1, mt2);
 
 			ACLMessage msg = receive(mt3);
-			
+
 			if(msg != null) {
 				AID aeronave = msg.getSender();
 				ACLMessage reply = msg.createReply();
@@ -278,7 +280,7 @@ public class Aeroporto extends Agent {
 		public void onTick() {
 			Random rand = new Random();
 			int newMeteo = rand.nextInt(4);
-			
+
 			//Only notify notory changes.
 			if(((condMeteo == 0 || condMeteo == 1 || condMeteo == 2) && newMeteo == 3) ||
 					(condMeteo == 3 && (newMeteo == 0 || newMeteo == 1 || newMeteo == 2))) {
@@ -291,6 +293,17 @@ public class Aeroporto extends Agent {
 					myAgent.send(msg);
 				}
 			}
+		}
+	}
+
+	class InformInterfaceBehaviour extends OneShotBehaviour {
+		@Override
+		public void action() {
+			ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+			msg.setOntology("info-airport");
+			msg.setContent(posicao.getX() + "::" + posicao.getY() + "::");
+			msg.addReceiver(agent_interface);
+			myAgent.send(msg);
 		}
 	}
 }

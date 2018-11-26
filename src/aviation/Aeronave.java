@@ -59,7 +59,7 @@ public class Aeronave extends Agent{
 		nr_airplanes = 0;
 		airplanes = new HashMap<AID, ACLMessage>();
 		action = false;
-		
+
 
 
 
@@ -335,7 +335,7 @@ public class Aeronave extends Agent{
 	}
 
 	class FlightBehav extends TickerBehaviour{
-		
+
 		public FlightBehav(Agent a, long period) {
 			super(a, period);
 		}
@@ -387,7 +387,7 @@ public class Aeronave extends Agent{
 	}
 
 	class BeaconBehav extends OneShotBehaviour{
-		
+
 
 		@Override
 		public void action() {
@@ -423,13 +423,13 @@ public class Aeronave extends Agent{
 				} else {
 					myAgent.addBehaviour(new MovePositionBehav());
 				}
-				
+
 			} catch(Exception e){
 				e.printStackTrace();
 			}
 		}
 	}
-	
+
 	class RadarBehav extends OneShotBehaviour{
 
 		@Override
@@ -465,13 +465,13 @@ public class Aeronave extends Agent{
 					if(next_distance <= protectedZone) {
 						System.out.println(myAgent.getLocalName() + ": Crash at" + next_pos.getX() + " " + next_pos.getY());
 						if(autority) {
-							
+
 							int decision = 0; // 0->do nothing, 1-> change route, 2-> slow down
 							//Get my direction
 							int h_dir = 0;  // -1 ->left, 0->steady, 1->right
 							int v_dir = 0;  // -1 ->down, 0->steady, 1->up
 							if(posicao.getX() -  next_pos.getX() < 0)
-								h_dir = 1; 
+								h_dir = 1;
 							else if(posicao.getX() -  next_pos.getX() > 0)
 								h_dir = -1;
 
@@ -481,7 +481,7 @@ public class Aeronave extends Agent{
 								v_dir = -1;
 
 							// Get his direction
-							int airplane_v_dir = 0;  // -1 ->left, 0->steady, 1->right 
+							int airplane_v_dir = 0;  // -1 ->left, 0->steady, 1->right
 							int airplane_h_dir = 0;  // -1 ->down, 0->steady, 1->up
 							if(airplane_x -  airplane_next_x < 0)
 								airplane_h_dir = 1;
@@ -492,7 +492,7 @@ public class Aeronave extends Agent{
 								airplane_v_dir = 1;
 							else if( airplane_y -  airplane_next_y > 0)
 								airplane_v_dir = -1;
-							
+
 							System.out.println(myAgent.getLocalName() + ": direction " + h_dir + " " + v_dir);
 							System.out.println(reply.getSender().getLocalName() + ": direction " + airplane_h_dir + " " + airplane_v_dir);
 
@@ -505,7 +505,7 @@ public class Aeronave extends Agent{
 								decision = 2;
 
 							}
-							
+
 							//Send decision
 							ACLMessage contract = reply.createReply();
 							contract.setPerformative(ACLMessage.INFORM);
@@ -520,7 +520,7 @@ public class Aeronave extends Agent{
 				}
 				myAgent.addBehaviour(new MovePositionBehav());
 			}
-			
+
 
 		}
 		private boolean calculateAutority(int p, int d, int v, int x, int y) {
@@ -539,7 +539,7 @@ public class Aeronave extends Agent{
 
 		}
 	}
-	
+
 	class MovePositionBehav extends OneShotBehaviour{
 
 		@Override
@@ -567,6 +567,13 @@ public class Aeronave extends Agent{
 					System.out.println(myAgent.getLocalName() + " asked to land in " + aeroportoAtual.getLocalName());
 				}
 			}
+
+			ACLMessage info = new ACLMessage(ACLMessage.INFORM);
+			info.setOntology("info-state");
+			info.setConversationId(""+ System.currentTimeMillis());
+			info.setContent(posicao.getX() + "::" + posicao.getY());
+			info.addReceiver(agent_interface);
+			myAgent.send(info);
 		}
 
 	}
@@ -665,7 +672,7 @@ public class Aeronave extends Agent{
 					}
 				} else if(ontology == "request-info"){
 					if(perf == ACLMessage.REQUEST) {
-						
+
 						ACLMessage info = reply.createReply();
 						info.setPerformative(ACLMessage.CONFIRM);
 						info.setOntology("request-info");
@@ -673,7 +680,7 @@ public class Aeronave extends Agent{
 						info.setContent(posicao.getX()+"::"+posicao.getY()+"::"+nPassageiros+"::"+distPercorrida+"::"+velocidade+"::"+next_pos.getX()+"::"+next_pos.getY());
 						info.setConversationId(""+System.currentTimeMillis());
 						myAgent.send(info);
-						
+
 					} else if(perf == ACLMessage.CONFIRM) {
 						airplanes.put(reply.getSender(), reply);
 //						System.out.println(myAgent.getLocalName() + " NrAirplanes " + nr_airplanes + " airplanes " + airplanes.size());
@@ -681,7 +688,7 @@ public class Aeronave extends Agent{
 							myAgent.addBehaviour(new RadarBehav());
 						}
 					}
-					
+
 				} else if(ontology == "info-decision") {
 					// Receiving decisions from authoritarian
 					System.out.println("Received decision" + reply);
@@ -692,7 +699,7 @@ public class Aeronave extends Agent{
 					Position next_airplane_pos = new Position(next_x, next_y);
 					if(aut_decision == 1) {
 						// recalculate
-						System.out.println(myAgent.getLocalName()+": Recalculating"); 
+						System.out.println(myAgent.getLocalName()+": Recalculating");
 						ArrayList<Position> detour = mapa.avoidCrash(posicao, next_airplane_pos, rota.get((velocidade*20)-1));
 						System.out.println(""+detour.size());
 						for(int j = 0; j < velocidade*20-1; j++) {
@@ -714,3 +721,4 @@ public class Aeronave extends Agent{
 		return Math.sqrt(Math.pow((dt_x - dc_x), 2) + Math.pow((dt_y - dc_y), 2));
 	}
 }
+
