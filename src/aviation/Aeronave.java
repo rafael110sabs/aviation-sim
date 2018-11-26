@@ -223,10 +223,10 @@ public class Aeronave extends Agent{
 		@Override
 		public void action() {
 			changing_route = true;
-			System.out.println(myAgent.getLocalName() + ": Started calculting route.");
+//			System.out.println(myAgent.getLocalName() + ": Started calculting route.");
 			rota = mapa.calculateRoute(posicao, pos_destino);
 			distPrevista = rota.size();
-			System.out.println(myAgent.getLocalName() + ": Finished calculting route. Distance: "+distPrevista);
+//			System.out.println(myAgent.getLocalName() + ": Finished calculting route. Distance: "+distPrevista);
 
 			if(first_pass) {
 				//Get weather on route
@@ -268,7 +268,7 @@ public class Aeronave extends Agent{
 				request.setConversationId(""+ System.currentTimeMillis());
 				request.addReceiver(aeroportoAtual);
 				myAgent.send(request);
-				System.out.println(myAgent.getLocalName() + ": Requested take off. Distance: "+distPrevista);
+//				System.out.println(myAgent.getLocalName() + ": Requested take off. Distance: "+distPrevista);
 			}
 		}
 
@@ -447,19 +447,19 @@ public class Aeronave extends Agent{
 
 				} else if (distance <= alertZone){
 					//Alert Zone
-					System.out.println(myAgent.getLocalName()+": ALERT ZONE");
+//					System.out.println(myAgent.getLocalName()+": ALERT ZONE");
 					int passengers = Integer.parseInt(content[2]);
 					int dist_trav = Integer.parseInt(content[3]);
 					int vel = Integer.parseInt(content[4]);
 					int airplane_next_x = Integer.parseInt(content[5]);
 					int airplane_next_y = Integer.parseInt(content[6]);
 					boolean autority = calculateAutority(passengers, dist_trav, vel,airplane_x,airplane_y);
-					System.out.println(myAgent.getLocalName() + ": distance:" + distance + " " + rota.size());
+//					System.out.println(myAgent.getLocalName() + ": distance:" + distance + " " + rota.size());
 
 					//Get the next position
 					Position next_pos = rota.get(velocidade*5-1);
 					double next_distance = calculateDistance(next_pos.getX(), next_pos.getY(), airplane_next_x, airplane_next_y);
-					System.out.println(myAgent.getLocalName() + ": next_distance:" + next_distance + "  " + rota.size());
+//					System.out.println(myAgent.getLocalName() + ": next_distance:" + next_distance + "  " + rota.size());
 
 					//If in the next position they get to close to each other
 					if(next_distance <= protectedZone) {
@@ -551,7 +551,7 @@ public class Aeronave extends Agent{
 			aeroportoAtual = mapa.getTerritory(posicao);
 
 			//			if(rota.size() % 10 == 0)
-			System.out.println(myAgent.getLocalName() + ": x=" + posicao.getX() + " y="+posicao.getY() + " distance left " + (distPrevista - distPercorrida ) + " at speed " + velocidade);
+//			System.out.println(myAgent.getLocalName() + ": x=" + posicao.getX() + " y="+posicao.getY() + " distance left " + (distPrevista - distPercorrida ) + " at speed " + velocidade);
 
 			if((distPrevista - distPercorrida ) <= 40) {
 				if(land_permission == 0 && aeroportoAtual != null) {
@@ -623,9 +623,9 @@ public class Aeronave extends Agent{
 
 					if(perf == ACLMessage.ACCEPT_PROPOSAL) {
 						// If it has received order to take-off and route is calculated then start take-off
-						System.out.println(myAgent.getLocalName() + ": Received take off clearance");
+//						System.out.println(myAgent.getLocalName() + ": Received take off clearance");
 						if(rota.size() > 0) {
-							System.out.println(myAgent.getLocalName() + ": Initiated take off");
+//							System.out.println(myAgent.getLocalName() + ": Initiated take off");
 							myAgent.addBehaviour(new StartTakeOffBehav(myAgent));
 						}
 					}
