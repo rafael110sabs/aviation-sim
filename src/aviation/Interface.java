@@ -1,7 +1,12 @@
 package aviation;
 
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.util.ArrayList;
 
+import javax.swing.JFrame;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import org.jfree.data.general.DefaultPieDataset;
@@ -10,7 +15,9 @@ import org.jfree.data.general.PieDataset;
 import aviation.Aeronave.FetchAirportsBehav;
 import jade.core.*;
 import jade.core.behaviours.CyclicBehaviour;
+import jade.core.behaviours.OneShotBehaviour;
 import jade.core.behaviours.SimpleBehaviour;
+import jade.core.behaviours.TickerBehaviour;
 import jade.domain.*;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
@@ -24,12 +31,13 @@ public class Interface extends Agent{
 	private int birthed,takenoff,landed,collision;
 	
 	//criação do objeto painel.
-    Panel panel=new Panel();	
+    Panel panel=Panel.main(null);	
 	@Override
 	protected void setup() {
 		
 		aeroportos = new ArrayList<AID>();
 		aeronaves = new ArrayList<AID>();
+		
 		DFAgentDescription dfd = new DFAgentDescription();
         dfd.setName(getAID());
         ServiceDescription sd = new ServiceDescription();
@@ -37,20 +45,24 @@ public class Interface extends Agent{
         sd.setName("Interface");
         
         dfd.addServices(sd);
-        //invocaçao do painel
-        panel.main(null);
+
         try {
             
             DFService.register(this, dfd);
-            //this.addBehaviour(new makeChart());
+            //procurar aeroportos
+            this.addBehaviour(new FetchAirportsBehav());
+            
+            //InfoXXX -> get information from other agents
             this.addBehaviour(new InfoBirth());
             this.addBehaviour(new InfoTakeOff());
             this.addBehaviour(new InfoLanding());
             this.addBehaviour(new InfoCollision());
             this.addBehaviour(new InfoState());
             this.addBehaviour(new InfoDecision());
+            //get command from input
             this.addBehaviour(new GetCommand());
-            this.addBehaviour(new StatLandings());
+            //create pie chart with stats
+            this.addBehaviour(new StatLandings(this,2000));
             
         } catch (FIPAException e) {
             e.printStackTrace();
@@ -69,34 +81,59 @@ public class Interface extends Agent{
 	}
 	
 
+	class FetchAirportsBehav extends OneShotBehaviour{
+
+		@Override
+		public void action() {
+
+			DFAgentDescription template = new DFAgentDescription();
+			ServiceDescription sd = new ServiceDescription();
+			sd.setType("estacao");
+			sd.setName("Aeroporto");
+			template.addServices(sd);
+			DFAgentDescription[] result;
+			try {
+				result = DFService.search(myAgent, template);
+				int nr_aeroportos = result.length;
+				for(int i = 0; i < nr_aeroportos; i++){
+					aeroportos.add(result[i].getName());
+				}
+			} catch(Exception e){
+				e.printStackTrace();
+			}
+		}
+	}
+	
 	
 	private class GetCommand extends CyclicBehaviour {
 		public void action() {
 			String command=panel.SendCommand();
-			String nave="Aeronave"+command.split(" ")[1];
-			
-			/*
-			 * Falta converter o texto em um AID para procurar no DF e devolver a mensagem a mostrar.
-			 */
-			
-			
-		try { //tenta encontrar nave	
-			
-			
-			
-			/*ACLMessage request = new ACLMessage(ACLMessage.REQUEST);
-			request.setOntology("request-state");
-			request.setConversationId(""+ System.currentTimeMillis());
-			request.addReceiver(reciever);
-			send(request);*/
-			
-			
-		}
-		catch(Exception e)
-		{
-			System.out.println(e.toString());
-		}
-		
+			try {
+				/*
+				 * Falta converter o texto em um AID para procurar no DF e devolver a mensagem a mostrar.
+				 */
+				
+				String nave="Aeronave"+command.split(" ")[1];
+				//tenta encontrar nave	
+				
+				
+				
+				/*ACLMessage request = new ACLMessage(ACLMessage.REQUEST);
+				request.setOntology("request-state");
+				request.setConversationId(""+ System.currentTimeMillis());
+				request.addReceiver(reciever);
+				send(request);*/
+				block(5000);
+				}
+			catch(Exception e)
+			{
+				System.out.println("INTERFACE ->Esperando comando!Experimente: Aeronave X");
+				panel.GetState(">Esperando comando!Experimente: Aeronave X");
+				block(5000);
+			}
+
+				
+
 				
 		}
 	}
@@ -255,21 +292,27 @@ public class Interface extends Agent{
 		}
 	}
 
-	class  StatLandings extends SimpleBehaviour{
-		@Override
-		public void action() {
-		PieDataset data=createDataset();
-		PieChart naves = new PieChart(data,"Aeronaves", "Descolagens/Aterragens de aeronaves");
+	class  StatLandings extends TickerBehaviour{
+		
+		
+		public StatLandings(Agent a, long period) {
+			super(a, period);
+		}
+
+		PieDataset data=createDataset();	
+		PieChart naves = new PieChart("Aeronaves", "Descolagens/Aterragens de aeronaves",data);
+		public void onTick() {
+		
+		naves.setVisible(false);
+		data=null;
+		naves=null;
+		block(2000);
+		data=createDataset();	
+		naves = new PieChart("Aeronaves", "Descolagens/Aterragens de aeronaves",data);
 		naves.pack();
 		naves.setVisible(true);
-		// TODO Auto-generated method stub
-	}
-
-				@Override
-				public boolean done() {
-					// TODO Auto-generated method stub
-					return false;
-				}
+		
+			}
 
 	}
 	
@@ -283,4 +326,5 @@ public class Interface extends Agent{
         return result;
 
         }
+	
 }

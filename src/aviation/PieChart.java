@@ -15,8 +15,9 @@ public class PieChart extends JFrame {
 
     private static final long serialVersionUID = 1L;
 
-    public PieChart(PieDataset dataset,String applicationTitle, String chartTitle) {
+    public PieChart(String applicationTitle, String chartTitle,PieDataset dataset) {
         super(applicationTitle);
+        // This will create the dataset
         // based on the dataset we create the chart
         JFreeChart chart = createChart(dataset, chartTitle);
         // we put the chart into a panel
@@ -25,6 +26,18 @@ public class PieChart extends JFrame {
         chartPanel.setPreferredSize(new java.awt.Dimension(500, 270));
         // add it to our application
         setContentPane(chartPanel);
+
+    }
+
+    /**
+     * Creates a sample dataset
+     */
+    private  PieDataset createDataset() {
+        DefaultPieDataset result = new DefaultPieDataset();
+        result.setValue("Linux", 29);
+        result.setValue("Mac", 20);
+        result.setValue("Windows", 51);
+        return result;
 
     }
 

@@ -12,10 +12,10 @@ public class Panel extends JPanel implements ActionListener {
     public Panel() {
         super(new GridBagLayout());
 
-        textField = new JTextField(20);
+        textField = new JTextField(50);
         textField.addActionListener(this);
 
-        textArea = new JTextArea(5, 20);
+        textArea = new JTextArea(30, 50);
         textArea.setEditable(false);
         JScrollPane scrollPane = new JScrollPane(textArea);
 
@@ -59,27 +59,30 @@ public class Panel extends JPanel implements ActionListener {
      * this method should be invoked from the
      * event dispatch thread.
      */
-    private static void createAndShowGUI() {
+    private static void createAndShowGUI(Panel panel) {
         //Create and set up the window.
-        JFrame frame = new JFrame("TextDemo");
+        JFrame frame = new JFrame("Interface de texto");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         //Add contents to the window.
-        frame.add(new Panel());
+        frame.add(panel);
 
         //Display the window.
         frame.pack();
         frame.setVisible(true);
     }
 
-    public static void main(String[] args) {
+    public static Panel main(String[] args) {
         //Schedule a job for the event dispatch thread:
         //creating and showing this application's GUI.
+    	Panel panel=new Panel();
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                createAndShowGUI();
+            	
+                createAndShowGUI(panel);
             }
         });
+		return panel;
     }
 }
 
