@@ -8,6 +8,7 @@ import jade.core.AID;
 
 public class Map {
 	
+	private final int AVOID = 12;
 	private final int TERRI_LENGTH = 80;
 	private final int RESTRICTED_ZONE = 20;
 	private final int MAP_SIZE = 481;
@@ -39,6 +40,32 @@ public class Map {
             pos.add(pos.size(),p);
         }
         return pos;
+	}
+	
+	public ArrayList<Position> avoidCrash(Position atual_pos, Position crash, Position dest_pos) {
+		Node initialNode = new Node(atual_pos.getX(), atual_pos.getY());
+        Node finalNode = new Node(dest_pos.getX(), dest_pos.getY());
+        int rows = MAP_SIZE, cols = MAP_SIZE;
+        setAvoid(crash);
+        AStar aStar = new AStar(rows, cols, map, initialNode, finalNode, 1, 2);
+        List<Node> path = aStar.findPath();
+        ArrayList<Position> pos = new ArrayList<Position>();
+        for (Node node : path) {
+            Position p = new Position(node.getRow(), node.getCol());
+            pos.add(pos.size(),p);
+        }
+        return pos;
+	}
+	
+	private void setAvoid(Position pos) {
+		int x = pos.getX()-(AVOID/2), y = pos.getY()-(AVOID/2);
+		for(int i = 0; i < AVOID; i++) {
+			for(int j = 0; j < AVOID; j++) {
+				//System.out.println((x+i) + " " + (y+j));
+				if(x+i >= 0 && y+j >= 0 && x+i < MAP_SIZE && y+j < MAP_SIZE)
+					map[x+i][y+j]= 1;
+			}
+		}
 	}
 	
 	private void initMap() {
@@ -89,7 +116,6 @@ public class Map {
 					map[x+i][y+j]= 1;
 			}
 		}
-		//System.out.println("Airport positioned at" +pos.getX()+ " " + pos.getY());
 	}
 
 }

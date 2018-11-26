@@ -56,7 +56,7 @@ public class Aeroporto extends Agent {
 			this.addBehaviour(new PositionRequest());
 			this.addBehaviour(new ParkingRequest());
 			this.addBehaviour(new TakeoffRequest());
-			this.addBehaviour(new TakeoffClearance());
+			this.addBehaviour(new TakeoffClearance(this, 5000));
 			this.addBehaviour(new TakeoffInform());
 			this.addBehaviour(new LandingRequest());
 			this.addBehaviour(new LandingClearance());
@@ -133,7 +133,7 @@ public class Aeroporto extends Agent {
 			ACLMessage msg = receive(mt3);
 
 			if(msg != null) {
-				System.out.println(myAgent.getLocalName() + ": got a takeoff request");
+//				System.out.println(myAgent.getLocalName() + ": got a takeoff request");
 				AID aeronave = msg.getSender();
 				pedidosDescolagem.add(aeronave);
 			} else
@@ -141,9 +141,14 @@ public class Aeroporto extends Agent {
 		}
 	}
 
-	class TakeoffClearance extends CyclicBehaviour {
+	class TakeoffClearance extends TickerBehaviour {
+		public TakeoffClearance(Agent a, long period) {
+			super(a, period);
+			// TODO Auto-generated constructor stub
+		}
+
 		@Override
-		public void action() {
+		public void onTick() {
 
 			if(!pedidosDescolagem.isEmpty()) {
 				if(nPistasDisponiveis > 0) {
@@ -229,7 +234,7 @@ public class Aeroporto extends Agent {
 		@Override
 		public void action() {
 			MessageTemplate mt1 = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
-			MessageTemplate mt2 = MessageTemplate.MatchOntology("info-landing");
+			MessageTemplate mt2 = MessageTemplate.MatchOntology("info-land");
 			MessageTemplate mt3 = MessageTemplate.and(mt1, mt2);
 
 			ACLMessage msg = receive(mt3);
