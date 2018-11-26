@@ -70,8 +70,6 @@ public class Interface extends Agent{
         try {
             
             DFService.register(this, dfd);
-            //procurar aeroportos
-            this.addBehaviour(new FetchAirportsBehav());
             
             //InfoXXX -> get information from other agents
             this.addBehaviour(new InfoBirth());
@@ -83,8 +81,10 @@ public class Interface extends Agent{
             this.addBehaviour(new InfoAirportState());
             //get command from input
             this.addBehaviour(new GetCommand());
+            //get state from command
+            this.addBehaviour(new GetState());
             //create pie chart with stats
-            this.addBehaviour(new StatLandings(this,2000));
+            this.addBehaviour(new StatLandings(this,10000));
             
         } catch (FIPAException e) {
             e.printStackTrace();
@@ -102,55 +102,35 @@ public class Interface extends Agent{
 		}
 	}
 	
-
-	class FetchAirportsBehav extends OneShotBehaviour{
-
-		@Override
-		public void action() {
-
-			DFAgentDescription template = new DFAgentDescription();
-			ServiceDescription sd = new ServiceDescription();
-			sd.setType("estacao");
-			sd.setName("Aeroporto");
-			template.addServices(sd);
-			DFAgentDescription[] result;
-			try {
-				result = DFService.search(myAgent, template);
-				int nr_aeroportos = result.length;
-				for(int i = 0; i < nr_aeroportos; i++){
-					aeroportos.add(result[i].getName());
-				}
-			} catch(Exception e){
-				e.printStackTrace();
-			}
-		}
-	}
-	
-	
 	private class GetCommand extends CyclicBehaviour {
 		public void action() {
 			String command=panel.SendCommand();
 			try {
-				/*
-				 * Falta converter o texto em um AID para procurar no DF e devolver a mensagem a mostrar.
-				 */
-				
-				String nave="Aeronave"+command.split(" ")[1];
-				//tenta encontrar nave	
-				
-				
-				
-				/*ACLMessage request = new ACLMessage(ACLMessage.REQUEST);
-				request.setOntology("request-state");
-				request.setConversationId(""+ System.currentTimeMillis());
-				request.addReceiver(reciever);
-				send(request);*/
-				block(5000);
+					/*
+					 * Falta converter o texto em um AID para procurar no DF e devolver a mensagem a mostrar.
+					 */
+				String pedido = command.split(" ")[0];
+					if(pedido.equals("Aeronave"))
+					{
+						String nave="Aeronave"+command.split(" ")[1];
+						AID agent_nave= new AID();
+						agent_nave.setLocalName(nave);
+						//tenta encontrar nave	
+						ACLMessage request = new ACLMessage(ACLMessage.REQUEST);
+						request.setOntology("request-state");
+						request.setPerformative(ACLMessage.REQUEST);
+						request.setConversationId(""+ System.currentTimeMillis());
+						request.addReceiver(agent_nave);
+						request.setContent("Pedido Estado!");
+						send(request);
+						
+					}
+					else {
+					block(5000);
+					}
 				}
 			catch(Exception e)
 			{
-//				System.out.println("INTERFACE ->Esperando comando!Experimente: Aeronave X");
-				panel.GetState(">Esperando comando!Experimente: Aeronave X");
 				block(5000);
 			}
 
@@ -170,15 +150,15 @@ public class Interface extends Agent{
 			if (info!=null) { 
 				String[] parts = info.getContent().split("::");
 				String detalhes=
-						"Posicao X:" + parts[1] + 
-						" Y:" + parts[2] + 
-						".Distanncia Percorrida:"+parts[3]+
-						". Distancia Prevista:"+ parts[4]+
-						".Velocidade:"+parts[5];
-				System.out.println("INTERFACE -> A nave: " + info.getSender().getLocalName()+" "+ parts[0] + "esta ->"
+						"Posicao X:" + parts[0] + 
+						" Y:" + parts[1] + 
+						".Distanncia Percorrida:"+parts[2]+
+						". Distancia Prevista:"+ parts[3]+
+						".Velocidade:"+parts[4];
+				System.out.println("INTERFACE ++-> A nave: " + info.getSender().getLocalName()+" "+ parts[0] + "esta ->"
 						+ detalhes );
-				//Enviar informa�ao para painel
-				panel.GetState("INTERFACE -> A nave: " + info.getSender().getLocalName()+" "+ parts[0] + "esta ->"
+				//Enviar informacao para painel
+				panel.GetState("INTERFACE ++-> A nave: " + info.getSender().getLocalName()+" "+ parts[0] + "esta ->"
 						+ detalhes );
 			} else
 				block();
@@ -202,6 +182,8 @@ public class Interface extends Agent{
 						".Passageiros:"+parts[3]+
 						". Origem:"+ parts[4];
 				System.out.println("INTERFACE -> A nave nasceu: " + info.getSender().getLocalName()+ " ->"
+						+ detalhes );
+				panel.GetState("INTERFACE -> A nave nasceu: " + info.getSender().getLocalName()+ " ->"
 						+ detalhes );
 				birthed++;
 				/*PARA ENVENTUAIS ESTATISTICAS
@@ -227,6 +209,8 @@ public class Interface extends Agent{
 				String destino = info.getContent();
 				System.out.println("INTERFACE -> A nave "+ info.getSender().getLocalName() +" aterrou em -> "
 						+ destino);
+				panel.GetState("INTERFACE -> A nave "+ info.getSender().getLocalName() +" aterrou em -> "
+						+ destino);
 				landed++;
 				
 				aeronavesGUI.remove(info.getSender());
@@ -248,6 +232,7 @@ public class Interface extends Agent{
 						"Origem:"+parts[0]+
 						" Destino:"+parts[1];
 				System.out.println("INTERFACE -> A nave "+ info.getSender().getLocalName() +" descolou -> " + detalhes);
+				panel.GetState("INTERFACE -> A nave "+ info.getSender().getLocalName() +" descolou -> " + detalhes);
 				takenoff++;
 				
 			} else 
@@ -269,6 +254,7 @@ public class Interface extends Agent{
 						"Posicao X:" + parts[0] + 
 						" Y:"+parts[1];
 				System.out.println("INTERFACE -> A seguinte nave "+info.getSender().getLocalName()+" colidiu-> " + detalhes);
+				panel.GetState("INTERFACE -> A seguinte nave "+info.getSender().getLocalName()+" colidiu-> " + detalhes);
 				colided++;
 			} else
 				block();
@@ -357,7 +343,7 @@ public class Interface extends Agent{
 
 	}
 
-	class InfoAirportState extends CyclicBehaviour {
+	class InfoAirportState extends CyclicBehaviour { 
 		@Override
 		public void action() {
 			MessageTemplate mt1 = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
@@ -383,10 +369,9 @@ public class Interface extends Agent{
 	   	
         DefaultPieDataset result = new DefaultPieDataset();  
             
-        result.setValue("Descolaram", takenoff);
-        result.setValue("Aterraram", landed);
-        result.setValue("Nasceram", birthed);
-        result.setValue("Colidiram", colided);
+        result.setValue("Descolaram "+takenoff, takenoff);
+        result.setValue("Aterraram "+landed, landed);
+        result.setValue("Colidiram "+colided, colided);
         return result;
 
         }

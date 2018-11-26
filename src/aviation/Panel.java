@@ -15,7 +15,7 @@ public class Panel extends JPanel implements ActionListener {
         textField = new JTextField(50);
         textField.addActionListener(this);
 
-        textArea = new JTextArea(30, 50);
+        textArea = new JTextArea(30, 100);
         textArea.setEditable(false);
         JScrollPane scrollPane = new JScrollPane(textArea);
 

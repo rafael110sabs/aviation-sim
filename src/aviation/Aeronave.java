@@ -85,7 +85,8 @@ public class Aeronave extends Agent{
 			this.addBehaviour(new RequestAirportPositions());
 			//Calculate route
 			//Ask for permission to take off
-
+			//Answer user command
+			this.addBehaviour(new AnswerState());
 
 		} catch (FIPAException e) {
 			e.printStackTrace();
@@ -739,6 +740,33 @@ public class Aeronave extends Agent{
 		}
 	}
 
+	class AnswerState extends CyclicBehaviour {
+
+		@Override
+		public void action() {
+			MessageTemplate mt1 = MessageTemplate.MatchOntology("request-state");
+			MessageTemplate mt2 = MessageTemplate.MatchPerformative(ACLMessage.REQUEST);
+			MessageTemplate mt3 = MessageTemplate.and(mt1,mt2);
+			ACLMessage info = receive(mt3);
+			
+			if (info!=null) {
+				ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
+				info.setOntology("inform-state");
+				info.setConversationId(""+ System.currentTimeMillis());
+				info.setContent(posicao.getX() + "::" + posicao.getY() + "::" + distPercorrida + "::" + distPrevista + "::" + velocidade);
+				info.addReceiver(agent_interface);
+				myAgent.send(message);
+			}
+			else
+			{
+				block();
+			}
+			
+		}
+
+	
+	}
+	
 	private double calculateDistance(double dc_x, double dc_y, double dt_x, double dt_y){
 		return Math.sqrt(Math.pow((dt_x - dc_x), 2) + Math.pow((dt_y - dc_y), 2));
 	}
