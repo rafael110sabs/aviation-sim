@@ -28,7 +28,7 @@ public class Interface extends Agent{
 	com os AAs como forma de observar o status e tomada de decisão das aeronaves*/
 	
 	private ArrayList<AID> aeroportos, aeronaves;	
-	private int birthed,takenoff,landed,collision;
+	private int birthed,takenoff,landed,colided;
 	
 	//criação do objeto painel.
     Panel panel=Panel.main(null);	
@@ -244,7 +244,7 @@ public class Interface extends Agent{
 						"Posição X:" + parts[1] + 
 						" Y:"+parts[2];
 				System.out.println("INTERFACE -> A seguinte nave "+parts[0]+" colidiu-> " + detalhes);
-				collision++;
+				colided++;
 			}
 
 		}
@@ -300,7 +300,7 @@ public class Interface extends Agent{
 		}
 
 		PieDataset data=createDataset();	
-		PieChart naves = new PieChart("Aeronaves", "Descolagens/Aterragens de aeronaves",data);
+		PieChart naves = new PieChart("Aeronaves", "Quantidades de aeronaves",data);
 		public void onTick() {
 		
 		naves.setVisible(false);
@@ -308,7 +308,7 @@ public class Interface extends Agent{
 		naves=null;
 		block(2000);
 		data=createDataset();	
-		naves = new PieChart("Aeronaves", "Descolagens/Aterragens de aeronaves",data);
+		naves = new PieChart("Aeronaves", "Quantidades de aeronaves",data);
 		naves.pack();
 		naves.setVisible(true);
 		
@@ -323,6 +323,7 @@ public class Interface extends Agent{
         result.setValue("Descolaram", takenoff);
         result.setValue("Aterraram", landed);
         result.setValue("Nasceram", birthed);
+        result.setValue("Colidiram", colided);
         return result;
 
         }
