@@ -183,7 +183,13 @@ public class Aeronave extends Agent{
 					mapa.setAirport(pos, airport, false);
 					posicao = pos;
 					found = true;
-					System.out.println(""+myAgent.getLocalName()+" has born in " + airport.getLocalName());
+//					System.out.println(""+myAgent.getLocalName()+" has born in " + airport.getLocalName());
+					
+					ACLMessage info_interface = new ACLMessage(ACLMessage.INFORM);
+					info_interface.setOntology("inform-birth");
+					info_interface.setContent(myAgent +"::" + pos.getX() + "::" + pos.getY() + "::" + nPassageiros + "::"+aeroportoAtual.getLocalName());
+					info_interface.addReceiver(agent_interface);
+					myAgent.send(info_interface);
 				}
 				// else found still's false
 			}
@@ -316,7 +322,8 @@ public class Aeronave extends Agent{
 				//send message to interface too
 
 				ACLMessage info = new ACLMessage(ACLMessage.INFORM);
-				info.setOntology("info-takeoff");
+				info.setOntology("inform-takeoff");
+				info.setContent(""+aeroportoAtual.getLocalName() + "::"+destino.getLocalName());
 				info.setConversationId(""+ System.currentTimeMillis());
 				info.addReceiver(agent_interface);
 				myAgent.send(info);
@@ -367,7 +374,8 @@ public class Aeronave extends Agent{
 							//send message to interface too
 
 							ACLMessage info = new ACLMessage(ACLMessage.INFORM);
-							info.setOntology("info-land");
+							info.setOntology("inform-land");
+							info.setContent(""+destino.getLocalName());
 							info.setConversationId(""+ System.currentTimeMillis());
 							info.addReceiver(agent_interface);
 							myAgent.send(info);
@@ -444,6 +452,13 @@ public class Aeronave extends Agent{
 				if(distance <= protectedZone) {
 					// Protected zone
 					System.out.println(myAgent.getLocalName()+": Mayday, we're going down. " + rota.size());
+					
+					ACLMessage info = new ACLMessage(ACLMessage.INFORM);
+					info.setOntology("inform-collision");
+					info.setContent(""+posicao.getX() + "::"+posicao.getY());
+					info.setConversationId(""+ System.currentTimeMillis());
+					info.addReceiver(agent_interface);
+					myAgent.send(info);
 
 				} else if (distance <= alertZone){
 					//Alert Zone
@@ -457,7 +472,7 @@ public class Aeronave extends Agent{
 //					System.out.println(myAgent.getLocalName() + ": distance:" + distance + " " + rota.size());
 
 					//Get the next position
-					Position next_pos = rota.get(velocidade*5-1);
+					Position next_pos = rota.get(velocidade*8-1);
 					double next_distance = calculateDistance(next_pos.getX(), next_pos.getY(), airplane_next_x, airplane_next_y);
 //					System.out.println(myAgent.getLocalName() + ": next_distance:" + next_distance + "  " + rota.size());
 
@@ -514,6 +529,13 @@ public class Aeronave extends Agent{
 							contract.setConversationId(""+System.currentTimeMillis());
 							myAgent.send(contract);
 							System.out.println(myAgent.getLocalName() + ": sent action to -> " + reply.getSender().getLocalName());
+							
+							ACLMessage info = new ACLMessage(ACLMessage.INFORM);
+							info.setOntology("inform-decision");
+							info.setContent(""+decision+"::"+myAgent.getLocalName()+"::"+ reply.getSender().getLocalName());
+							info.setConversationId(""+ System.currentTimeMillis());
+							info.addReceiver(agent_interface);
+							myAgent.send(info);
 
 						}
 					}
@@ -676,7 +698,7 @@ public class Aeronave extends Agent{
 						ACLMessage info = reply.createReply();
 						info.setPerformative(ACLMessage.CONFIRM);
 						info.setOntology("request-info");
-						Position next_pos = rota.get(velocidade*5-1);
+						Position next_pos = rota.get(velocidade*8-1);
 						info.setContent(posicao.getX()+"::"+posicao.getY()+"::"+nPassageiros+"::"+distPercorrida+"::"+velocidade+"::"+next_pos.getX()+"::"+next_pos.getY());
 						info.setConversationId(""+System.currentTimeMillis());
 						myAgent.send(info);

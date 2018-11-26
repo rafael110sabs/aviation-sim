@@ -13,6 +13,9 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 
 import jade.core.Timer;
+
+import org.jfree.data.general.DatasetChangeEvent;
+import org.jfree.data.general.DatasetChangeListener;
 import org.jfree.data.general.DefaultPieDataset;
 import org.jfree.data.general.PieDataset;
 
@@ -59,7 +62,7 @@ public class Interface extends Agent{
 		DFAgentDescription dfd = new DFAgentDescription();
         dfd.setName(getAID());
         ServiceDescription sd = new ServiceDescription();
-        sd.setType("inteface");
+        sd.setType("interface");
         sd.setName("Interface");
         
         dfd.addServices(sd);
@@ -146,7 +149,7 @@ public class Interface extends Agent{
 				}
 			catch(Exception e)
 			{
-				System.out.println("INTERFACE ->Esperando comando!Experimente: Aeronave X");
+//				System.out.println("INTERFACE ->Esperando comando!Experimente: Aeronave X");
 				panel.GetState(">Esperando comando!Experimente: Aeronave X");
 				block(5000);
 			}
@@ -167,17 +170,18 @@ public class Interface extends Agent{
 			if (info!=null) { 
 				String[] parts = info.getContent().split("::");
 				String detalhes=
-						"Posi��o X:" + parts[1] + 
+						"Posicao X:" + parts[1] + 
 						" Y:" + parts[2] + 
-						".Dist�ncia Percorrida:"+parts[3]+
-						". Dist�ncia Prevista:"+ parts[4]+
+						".Distanncia Percorrida:"+parts[3]+
+						". Distancia Prevista:"+ parts[4]+
 						".Velocidade:"+parts[5];
-				System.out.println("INTERFACE -> A nave: " + info.getSender().getLocalName()+" "+ parts[0] + "est� ->"
+				System.out.println("INTERFACE -> A nave: " + info.getSender().getLocalName()+" "+ parts[0] + "esta ->"
 						+ detalhes );
 				//Enviar informa�ao para painel
-				panel.GetState("INTERFACE -> A nave: " + info.getSender().getLocalName()+" "+ parts[0] + "est� ->"
+				panel.GetState("INTERFACE -> A nave: " + info.getSender().getLocalName()+" "+ parts[0] + "esta ->"
 						+ detalhes );
-			}
+			} else
+				block();
 
 		}
 	}
@@ -193,11 +197,11 @@ public class Interface extends Agent{
 
 				String[] parts = info.getContent().split("::");
 				String detalhes=
-						"Posi��o X:" + parts[1] + 
+						"Posicao X:" + parts[1] + 
 						" Y:" + parts[2] + 
 						".Passageiros:"+parts[3]+
 						". Origem:"+ parts[4];
-				System.out.println("INTERFACE -> A nave originou: " + info.getSender().getLocalName()+" "+ parts[0] + " ->"
+				System.out.println("INTERFACE -> A nave nasceu: " + info.getSender().getLocalName()+ " ->"
 						+ detalhes );
 				birthed++;
 				/*PARA ENVENTUAIS ESTATISTICAS
@@ -220,10 +224,12 @@ public class Interface extends Agent{
 			ACLMessage info = receive(mt3);
 	
 			if (info!=null) { 
-				String[] parts = info.getContent().split("::");
-				System.out.println("INTERFACE -> A nave "+ parts[0] +" aterrou em -> "
-						+ parts[1]);
+				String destino = info.getContent();
+				System.out.println("INTERFACE -> A nave "+ info.getSender().getLocalName() +" aterrou em -> "
+						+ destino);
 				landed++;
+				
+				aeronavesGUI.remove(info.getSender());
 			}
 
 		}
@@ -239,12 +245,13 @@ public class Interface extends Agent{
 			if (info!=null) {  
 				String[] parts = info.getContent().split("::");
 				String detalhes=
-						"Origem:"+parts[1]+
-						" Destino:"+parts[2];
-				System.out.println("INTERFACE -> A nave "+ parts[0] +" descolou -> " + detalhes);
+						"Origem:"+parts[0]+
+						" Destino:"+parts[1];
+				System.out.println("INTERFACE -> A nave "+ info.getSender().getLocalName() +" descolou -> " + detalhes);
 				takenoff++;
 				
-			}
+			} else 
+				block();
 
 		}
 	}
@@ -259,11 +266,12 @@ public class Interface extends Agent{
 			if (info!=null) {  
 				String[] parts = info.getContent().split("::");
 				String detalhes=
-						"Posi��o X:" + parts[1] + 
-						" Y:"+parts[2];
-				System.out.println("INTERFACE -> A seguinte nave "+parts[0]+" colidiu-> " + detalhes);
+						"Posicao X:" + parts[0] + 
+						" Y:"+parts[1];
+				System.out.println("INTERFACE -> A seguinte nave "+info.getSender().getLocalName()+" colidiu-> " + detalhes);
 				colided++;
-			}
+			} else
+				block();
 
 		}
 	}
@@ -279,19 +287,20 @@ public class Interface extends Agent{
 				AID aeronave = info.getSender();
 				String[] parts = info.getContent().split("::");
 				String detalhes = 
-						"Posi��o X:"+parts[0] +
+						"Posicao X:"+parts[0] +
 						" Y:" +parts[1] +
 						". Distancia Percorrida:" +parts[2]+
 						". Distancia Prevista:" +parts[3]+
 						". Velocidade:"+parts[4];
 						
-				System.out.println("INTERFACE -> A nave "+parts[0]+" est� -> "+detalhes);
+				System.out.println("INTERFACE -> A nave "+info.getSender().getLocalName()+" esta -> "+detalhes);
 
 				int x = Integer.parseInt(parts[0]);
 				int y = Integer.parseInt(parts[1]);
 				Position pos = new Position(x,y);
 				aeronavesGUI.put(aeronave, pos);
-			}
+			} else 
+				block();
 
 		}
 	}
@@ -305,13 +314,19 @@ public class Interface extends Agent{
 			
 			if (info!=null) {  
 				String[] parts=info.getContent().split("::");
-				String detalhes=
-						"Posi��o X:"+parts[1] +
-						" Y:" +parts[2] +
-						". Decis�o:"+parts[3];
+				String deci = "";
+				int decision = Integer.parseInt(parts[0]);
+				switch(decision) {
+					case 1: deci = "recalcular a rota.";
+							break;
+					case 2: deci = "acelerar.";
+							break;
+				}
+				
 						
-				System.out.println("INTERFACE -> A nave "+parts[0]+" decidiu -> "+detalhes);
-			}
+				System.out.println("INTERFACE -> A nave "+parts[0]+" decidiu que a nave " + parts[1] + " deve "+ deci);
+			} else
+				block();
 
 		}
 	}
@@ -323,8 +338,10 @@ public class Interface extends Agent{
 			super(a, period);
 		}
 
-		PieDataset data=createDataset();	
+		PieDataset data=createDataset();
 		PieChart naves = new PieChart("Aeronaves", "Quantidades de aeronaves",data);
+		
+		
 		public void onTick() {
 		
 		naves.setVisible(false);
@@ -350,13 +367,15 @@ public class Interface extends Agent{
 			ACLMessage msg = receive(mt3);
 
 			if(msg != null) {
+				System.out.println("received airport");
 				AID aeroporto = msg.getSender();
 				String[] content_split = msg.getContent().split("::");
 				int x = Integer.parseInt(content_split[0]);
 				int y = Integer.parseInt(content_split[1]);
 				Position pos = new Position(x,y);
 				aeroportosGUI.put(aeroporto, pos);
-			}
+			}else 
+				block();
 		}
 	}
 	
@@ -401,7 +420,7 @@ class Draw extends JPanel {
 		BufferedImage background = null;
 
 		try {
-			background = ImageIO.read(new File("/Users/rps/Desktop/map.png"));
+			background = ImageIO.read(new File("img/map.png"));
 		} catch (IOException e) {
 			System.out.println(e);
 		}
@@ -415,7 +434,7 @@ class Draw extends JPanel {
 			BufferedImage img = null;
 
 			try {
-				img = ImageIO.read(new File("/Users/rps/Desktop/23-512.png"));
+				img = ImageIO.read(new File("img/airplane.png"));
 			} catch (IOException e) {
 				System.out.println(e);
 			}
@@ -431,7 +450,7 @@ class Draw extends JPanel {
 			BufferedImage img = null;
 
 			try {
-				img = ImageIO.read(new File("/Users/rps/Desktop/img_67236.png"));
+				img = ImageIO.read(new File("img/airport.png"));
 			} catch (IOException e) {
 				System.out.println(e);
 			}
