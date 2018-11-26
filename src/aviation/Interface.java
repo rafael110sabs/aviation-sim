@@ -29,19 +29,19 @@ import jade.lang.acl.*;
 
 public class Interface extends Agent{
 	/* com o qual o utilizador vai interagir
-	com os AAs como forma de observar o status e tomada de decis¿o das aeronaves*/
-
+	com os AAs como forma de observar o status e tomada de decisï¿½o das aeronaves*/
+	
 	private ArrayList<AID> aeroportos, aeronaves;
 	private HashMap<AID, Position> aeronavesGUI, aeroportosGUI;
 	private Draw draw;
 	private JFrame frame;
 	private int birthed,takenoff,landed,colided;
-
-	//cria¿¿o do objeto painel.
-    Panel panel=Panel.main(null);
+	
+	//criaï¿½ï¿½o do objeto painel.
+    Panel panel=Panel.main(null);	
 	@Override
 	protected void setup() {
-
+		
 		aeroportos = new ArrayList<AID>();
 		aeronaves = new ArrayList<AID>();
 		aeronavesGUI = new HashMap<>();
@@ -55,21 +55,21 @@ public class Interface extends Agent{
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
 		frame.setPreferredSize(new Dimension(480, 480));
-
+		
 		DFAgentDescription dfd = new DFAgentDescription();
         dfd.setName(getAID());
         ServiceDescription sd = new ServiceDescription();
         sd.setType("inteface");
         sd.setName("Interface");
-
+        
         dfd.addServices(sd);
 
         try {
-
+            
             DFService.register(this, dfd);
             //procurar aeroportos
             this.addBehaviour(new FetchAirportsBehav());
-
+            
             //InfoXXX -> get information from other agents
             this.addBehaviour(new InfoBirth());
             this.addBehaviour(new InfoTakeOff());
@@ -82,12 +82,12 @@ public class Interface extends Agent{
             this.addBehaviour(new GetCommand());
             //create pie chart with stats
             this.addBehaviour(new StatLandings(this,2000));
-
+            
         } catch (FIPAException e) {
             e.printStackTrace();
         }
 	}
-
+	
 	@Override
 	protected void takeDown(){
 		super.takeDown();
@@ -98,7 +98,7 @@ public class Interface extends Agent{
 			e.printStackTrace();
 		}
 	}
-
+	
 
 	class FetchAirportsBehav extends OneShotBehaviour{
 
@@ -122,8 +122,8 @@ public class Interface extends Agent{
 			}
 		}
 	}
-
-
+	
+	
 	private class GetCommand extends CyclicBehaviour {
 		public void action() {
 			String command=panel.SendCommand();
@@ -131,12 +131,12 @@ public class Interface extends Agent{
 				/*
 				 * Falta converter o texto em um AID para procurar no DF e devolver a mensagem a mostrar.
 				 */
-
+				
 				String nave="Aeronave"+command.split(" ")[1];
-				//tenta encontrar nave
-
-
-
+				//tenta encontrar nave	
+				
+				
+				
 				/*ACLMessage request = new ACLMessage(ACLMessage.REQUEST);
 				request.setOntology("request-state");
 				request.setConversationId(""+ System.currentTimeMillis());
@@ -151,50 +151,50 @@ public class Interface extends Agent{
 				block(5000);
 			}
 
+				
 
-
-
+				
 		}
 	}
-
+	
 	private class GetState extends CyclicBehaviour {
 		public void action() {
 			MessageTemplate mt1 = MessageTemplate.MatchOntology("inform-state");
 			MessageTemplate mt2 = MessageTemplate.MatchPerformative(ACLMessage.REQUEST);
 			MessageTemplate mt3 = MessageTemplate.and(mt1,mt2);
 			ACLMessage info = receive(mt3);
-
-			if (info!=null) {
+			
+			if (info!=null) { 
 				String[] parts = info.getContent().split("::");
 				String detalhes=
-						"Posi¿¿o X:" + parts[1] +
-						" Y:" + parts[2] +
-						".Dist¿ncia Percorrida:"+parts[3]+
-						". Dist¿ncia Prevista:"+ parts[4]+
+						"Posiï¿½ï¿½o X:" + parts[1] + 
+						" Y:" + parts[2] + 
+						".Distï¿½ncia Percorrida:"+parts[3]+
+						". Distï¿½ncia Prevista:"+ parts[4]+
 						".Velocidade:"+parts[5];
-				System.out.println("INTERFACE -> A nave: " + info.getSender().getLocalName()+" "+ parts[0] + "est¿ ->"
+				System.out.println("INTERFACE -> A nave: " + info.getSender().getLocalName()+" "+ parts[0] + "estï¿½ ->"
 						+ detalhes );
-				//Enviar informa¿ao para painel
-				panel.GetState("INTERFACE -> A nave: " + info.getSender().getLocalName()+" "+ parts[0] + "est¿ ->"
+				//Enviar informaï¿½ao para painel
+				panel.GetState("INTERFACE -> A nave: " + info.getSender().getLocalName()+" "+ parts[0] + "estï¿½ ->"
 						+ detalhes );
 			}
 
 		}
 	}
-
+	
 	private class InfoBirth extends CyclicBehaviour {
 		public void action() {
 			MessageTemplate mt1 = MessageTemplate.MatchOntology("inform-birth");
 			MessageTemplate mt2 = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
 			MessageTemplate mt3 = MessageTemplate.and(mt1,mt2);
 			ACLMessage info = receive(mt3);
-
-			if (info!=null) {
+			
+			if (info!=null) { 
 
 				String[] parts = info.getContent().split("::");
 				String detalhes=
-						"Posi¿¿o X:" + parts[1] +
-						" Y:" + parts[2] +
+						"Posiï¿½ï¿½o X:" + parts[1] + 
+						" Y:" + parts[2] + 
 						".Passageiros:"+parts[3]+
 						". Origem:"+ parts[4];
 				System.out.println("INTERFACE -> A nave originou: " + info.getSender().getLocalName()+" "+ parts[0] + " ->"
@@ -203,7 +203,7 @@ public class Interface extends Agent{
 				/*PARA ENVENTUAIS ESTATISTICAS
 				 * String[] parts = info.getContent().split("::");
 				int n_passangers = Integer.parseInt(parts[3]);
-
+				
 				String agentname = info.getSender().getLocalName();
 				agentname = agentname.substring(getLocalName().length() - 1);*/
 
@@ -211,15 +211,15 @@ public class Interface extends Agent{
 
 		}
 	}
-
+	
 	private class InfoLanding extends CyclicBehaviour {
 		public void action() {
 			MessageTemplate mt1 = MessageTemplate.MatchOntology("inform-land");
 			MessageTemplate mt2 = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
 			MessageTemplate mt3 = MessageTemplate.and(mt1,mt2);
 			ACLMessage info = receive(mt3);
-
-			if (info!=null) {
+	
+			if (info!=null) { 
 				String[] parts = info.getContent().split("::");
 				System.out.println("INTERFACE -> A nave "+ parts[0] +" aterrou em -> "
 						+ parts[1]);
@@ -235,15 +235,15 @@ public class Interface extends Agent{
 			MessageTemplate mt2 = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
 			MessageTemplate mt3 = MessageTemplate.and(mt1,mt2);
 			ACLMessage info = receive(mt3);
-
-			if (info!=null) {
+			
+			if (info!=null) {  
 				String[] parts = info.getContent().split("::");
 				String detalhes=
 						"Origem:"+parts[1]+
 						" Destino:"+parts[2];
 				System.out.println("INTERFACE -> A nave "+ parts[0] +" descolou -> " + detalhes);
 				takenoff++;
-
+				
 			}
 
 		}
@@ -255,11 +255,11 @@ public class Interface extends Agent{
 			MessageTemplate mt2 = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
 			MessageTemplate mt3 = MessageTemplate.and(mt1,mt2);
 			ACLMessage info = receive(mt3);
-
-			if (info!=null) {
+			
+			if (info!=null) {  
 				String[] parts = info.getContent().split("::");
 				String detalhes=
-						"Posi¿¿o X:" + parts[1] +
+						"Posiï¿½ï¿½o X:" + parts[1] + 
 						" Y:"+parts[2];
 				System.out.println("INTERFACE -> A seguinte nave "+parts[0]+" colidiu-> " + detalhes);
 				colided++;
@@ -267,25 +267,25 @@ public class Interface extends Agent{
 
 		}
 	}
-
+	
 	private class InfoState extends CyclicBehaviour {
 		public void action() {
 			MessageTemplate mt1 = MessageTemplate.MatchOntology("inform-state");
 			MessageTemplate mt2 = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
 			MessageTemplate mt3 = MessageTemplate.and(mt1,mt2);
 			ACLMessage info = receive(mt3);
-
+			
 			if (info!=null) {
 				AID aeronave = info.getSender();
 				String[] parts = info.getContent().split("::");
-				String detalhes =
-						"Posi¿¿o X:"+parts[1] +
-						" Y:" +parts[2] +
-						". Distancia Percorrida:" +parts[3]+
-						". Distancia Prevista:" +parts[4]+
-						". Velocidade:"+parts[5];
-
-				System.out.println("INTERFACE -> A nave "+parts[0]+" est¿ -> "+detalhes);
+				String detalhes = 
+						"Posiï¿½ï¿½o X:"+parts[0] +
+						" Y:" +parts[1] +
+						". Distancia Percorrida:" +parts[2]+
+						". Distancia Prevista:" +parts[3]+
+						". Velocidade:"+parts[4];
+						
+				System.out.println("INTERFACE -> A nave "+parts[0]+" estï¿½ -> "+detalhes);
 
 				int x = Integer.parseInt(parts[0]);
 				int y = Integer.parseInt(parts[1]);
@@ -302,14 +302,14 @@ public class Interface extends Agent{
 			MessageTemplate mt2 = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
 			MessageTemplate mt3 = MessageTemplate.and(mt1,mt2);
 			ACLMessage info = receive(mt3);
-
-			if (info!=null) {
+			
+			if (info!=null) {  
 				String[] parts=info.getContent().split("::");
 				String detalhes=
-						"Posi¿¿o X:"+parts[1] +
+						"Posiï¿½ï¿½o X:"+parts[1] +
 						" Y:" +parts[2] +
-						". Decis¿o:"+parts[3];
-
+						". Decisï¿½o:"+parts[3];
+						
 				System.out.println("INTERFACE -> A nave "+parts[0]+" decidiu -> "+detalhes);
 			}
 
@@ -317,25 +317,25 @@ public class Interface extends Agent{
 	}
 
 	class  StatLandings extends TickerBehaviour{
-
-
+		
+		
 		public StatLandings(Agent a, long period) {
 			super(a, period);
 		}
 
-		PieDataset data=createDataset();
+		PieDataset data=createDataset();	
 		PieChart naves = new PieChart("Aeronaves", "Quantidades de aeronaves",data);
 		public void onTick() {
-
+		
 		naves.setVisible(false);
 		data=null;
 		naves=null;
 		block(2000);
-		data=createDataset();
+		data=createDataset();	
 		naves = new PieChart("Aeronaves", "Quantidades de aeronaves",data);
 		naves.pack();
 		naves.setVisible(true);
-
+		
 			}
 
 	}
@@ -359,11 +359,11 @@ public class Interface extends Agent{
 			}
 		}
 	}
-
+	
 	private  PieDataset createDataset() {
-
-        DefaultPieDataset result = new DefaultPieDataset();
-
+	   	
+        DefaultPieDataset result = new DefaultPieDataset();  
+            
         result.setValue("Descolaram", takenoff);
         result.setValue("Aterraram", landed);
         result.setValue("Nasceram", birthed);
@@ -371,7 +371,7 @@ public class Interface extends Agent{
         return result;
 
         }
-
+	
 }
 
 class Draw extends JPanel {
@@ -435,7 +435,7 @@ class Draw extends JPanel {
 			} catch (IOException e) {
 				System.out.println(e);
 			}
-			g.drawImage(img, x, y, 10, 10, null);
+			g.drawImage(img, x, y, 12, 12, null);
 		}
 
 		g.setColor(Color.GREEN);

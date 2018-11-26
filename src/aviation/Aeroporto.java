@@ -65,6 +65,7 @@ public class Aeroporto extends Agent {
 			this.addBehaviour(new LandingInform());
 			this.addBehaviour(new InformMeteo());
 			this.addBehaviour(new InformMeteoChange(this));
+			this.addBehaviour(new InformInterfaceBehaviour());
 
 		} catch (FIPAException e) {
 			e.printStackTrace();
@@ -100,7 +101,7 @@ public class Aeroporto extends Agent {
 			MessageTemplate mt3 = MessageTemplate.and(mt1, mt2);
 
 			ACLMessage msg = receive(mt3);
-
+			
 			if(msg != null) {
 				AID aeronave = msg.getSender();
 				ACLMessage reply = msg.createReply();
@@ -280,7 +281,7 @@ public class Aeroporto extends Agent {
 		public void onTick() {
 			Random rand = new Random();
 			int newMeteo = rand.nextInt(4);
-
+			
 			//Only notify notory changes.
 			if(((condMeteo == 0 || condMeteo == 1 || condMeteo == 2) && newMeteo == 3) ||
 					(condMeteo == 3 && (newMeteo == 0 || newMeteo == 1 || newMeteo == 2))) {
